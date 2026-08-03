@@ -55,31 +55,55 @@ export default function App() {
     return () => clearInterval(timer);
   }, []);
 
-  // Form Inputs State (Persisted in localStorage)
+  // Form Inputs State (Persisted in localStorage safely)
   const [betText, setBetText] = useState(() => {
-    return localStorage.getItem(LOCAL_STORAGE_KEYS.BET_TEXT) ?? DEFAULT_SAMPLE_BET_TEXT;
+    try {
+      return localStorage.getItem(LOCAL_STORAGE_KEYS.BET_TEXT) ?? DEFAULT_SAMPLE_BET_TEXT;
+    } catch {
+      return DEFAULT_SAMPLE_BET_TEXT;
+    }
   });
 
   const [bannedText, setBannedText] = useState(() => {
-    return localStorage.getItem(LOCAL_STORAGE_KEYS.BANNED_TEXT) ?? '89';
+    try {
+      return localStorage.getItem(LOCAL_STORAGE_KEYS.BANNED_TEXT) ?? '89';
+    } catch {
+      return '89';
+    }
   });
 
   const [commissionPct, setCommissionPct] = useState<number>(() => {
-    const raw = localStorage.getItem(LOCAL_STORAGE_KEYS.COMMISSION_PCT);
-    return raw ? parseFloat(raw) : 20;
+    try {
+      const raw = localStorage.getItem(LOCAL_STORAGE_KEYS.COMMISSION_PCT);
+      return raw ? parseFloat(raw) : 20;
+    } catch {
+      return 20;
+    }
   });
 
   // Sync to localStorage
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEYS.BET_TEXT, betText);
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEYS.BET_TEXT, betText);
+    } catch {
+      // ignore
+    }
   }, [betText]);
 
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEYS.BANNED_TEXT, bannedText);
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEYS.BANNED_TEXT, bannedText);
+    } catch {
+      // ignore
+    }
   }, [bannedText]);
 
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEYS.COMMISSION_PCT, String(commissionPct));
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEYS.COMMISSION_PCT, String(commissionPct));
+    } catch {
+      // ignore
+    }
   }, [commissionPct]);
 
   // Current logged in user account details
