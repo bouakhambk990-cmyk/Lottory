@@ -680,7 +680,7 @@
     COL_NUMBER: 'C',
     COL_PRICE: 'D'
   };
-  var SHEETS_ENABLED = !!CONFIG.WEBAPP_URL ;
+  var SHEETS_ENABLED = !!CONFIG.WEBAPP_URL && CONFIG.WEBAPP_URL.indexOf('laoLotteryCalcSession') !== 0;
   var SESSION_KEY = 'laoLotteryCalcSession_v1';
 
   function gsGet(params){
