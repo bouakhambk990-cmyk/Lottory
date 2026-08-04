@@ -1,0 +1,6 @@
+{
+  "name": "Lao Lottery Calculator & Multi-Sheet System",
+  "description": "ຕູ້ຄິດໄລ່ຫວຍ ແລະ ລະບົບຈັດການຍອດສົ່ງ Google Sheet ຕາມຢູເຊີ",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
