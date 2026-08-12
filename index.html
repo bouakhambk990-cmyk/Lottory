@@ -393,42 +393,6 @@
   }
   .quick-sheet .sheet-status{margin-top:10px;text-align:center;}
 
-  /* ---- compact combo panel ---- */
-  .quick-sheet.compact-panel{padding:10px 14px;margin-bottom:16px;}
-  .quick-sheet-top.compact{margin-bottom:8px;}
-  .compact-title{font-size:13px !important;}
-  .dest-badge.compact{font-size:10.5px;padding:3px 9px;}
-  .compact-row{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;}
-  .quick-sheet-actions.compact-row .btn.compact{min-width:0;padding:8px 16px;font-size:12.5px;}
-  .sheet-status.compact{font-size:12px;margin-top:8px;}
-
-  /* ---- bill ticket receipt ---- */
-  .bill-ticket{
-    background:var(--panel-alt);
-    border:1px dashed var(--gold);
-    border-radius:10px;
-    padding:14px 16px;
-  }
-  .bill-brand{text-align:center;color:var(--gold-bright);font-weight:600;margin-bottom:8px;}
-  .bill-head{border-bottom:1px dashed var(--line-soft);padding-bottom:8px;margin-bottom:8px;}
-  .bill-head-row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--cream-dim);padding:2px 0;}
-  .bill-head-row b{color:var(--cream);}
-  .bill-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;}
-  .bill-item{
-    display:flex;justify-content:space-between;align-items:center;gap:8px;
-    background:var(--panel);border:1px solid var(--line-soft);border-radius:6px;
-    padding:6px 10px;font-size:12.5px;
-  }
-  .bill-item-nums{color:var(--cream);word-break:break-word;}
-  .bill-item-price{color:var(--gold-bright);white-space:nowrap;}
-  .bill-total{
-    display:flex;justify-content:space-between;align-items:center;
-    border-top:1px dashed var(--line-soft);margin-top:10px;padding-top:10px;
-    font-size:14px;color:var(--cream);
-  }
-  .bill-total b{color:var(--gold-bright);font-size:16px;}
-  @media (max-width:520px){ .bill-grid{grid-template-columns:1fr;} }
-
   /* ---- syntax guide modal ---- */
   .guide-trigger-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
   #modalOverlay{
@@ -594,17 +558,15 @@
     <div class="ticket-badge mono" id="ticketClock">—</div>
   </header>
 
-  <div class="quick-sheet compact-panel" id="quickSheetPanel" style="display:none;">
-    <div class="quick-sheet-top compact">
-      <h2 class="compact-title">⚡ ສົ່ງຍອດ+ອອກບີນ+ກັອບປີ້</h2>
-      <div class="dest-badge compact" id="destBadge">ຊິດ: <b id="destUsername">—</b></div>
+  <div class="quick-sheet" id="quickSheetPanel" style="display:none;">
+    <div class="quick-sheet-top">
+      <h2>⚡ ສົ່ງເຂົ້າ Google Sheet</h2>
+      <div class="dest-badge" id="destBadge">ຈະສົ່ງໄປ Google Sheet ຂອງ: <b id="destUsername">—</b></div>
     </div>
-    <div class="quick-sheet-actions compact-row">
-      <button class="btn compact" id="sheetSendAllBtn" type="button">🚀 ສົ່ງ+ອອກບີນ+ກັອບປີ້</button>
-      <button class="mini-btn" id="toggleBillBtn" type="button" style="display:none;">🧾 ເບິ່ງໃບບີນ</button>
+    <div class="quick-sheet-actions">
+      <button class="btn compact" id="sheetSendAllBtn" type="button">ສົ່ງຍອດລວມ</button>
     </div>
-    <div class="sheet-status compact" id="sheetStatus"></div>
-    <div id="billReceiptWrap" style="display:none;margin-top:10px;"></div>
+    <div class="sheet-status" id="sheetStatus"></div>
   </div>
 
   <div class="admin-panel" id="adminPanel">
@@ -633,22 +595,6 @@
             <button class="mini-btn gold" id="changeAdminPwBtn" type="button">ບັນທຶກລະຫັດໃໝ່</button>
           </div>
           <div class="admin-status" id="changeAdminPwStatus"></div>
-        </div>
-      </details>
-      <details>
-        <summary>🏷️ ຂໍ້ຄວາມລາຍເຊັນ / ໂລໂກ (Watermark)</summary>
-        <div style="padding:14px 16px;">
-          <p style="font-size:13px;opacity:.75;margin:0 0 10px;">
-            ຂໍ້ຄວາມນີ້ຈະຖືກໃສ່ຫົວ+ທ້າຍ ໃນຂໍ້ຄວາມ "ໃບສະຫລຸບ" ທີ່ກັອບປີ້ ແລະ ຢູ່ໃນໃບບີນທີ່ອອກ (ຄືລາຍເຊັນ/ໂລໂກ ຂອງທ່ານ)
-          </p>
-          <div class="admin-row">
-            <div class="field">
-              <label for="newBrandText">ຂໍ້ຄວາມ (ຊື່ຮ້ານ, ສະໂລແກນ ຫຼືອື່ນໆ)</label>
-              <input type="text" id="newBrandText" class="mono" placeholder="ເຊັ່ນ: ✦ ຮ້ານ ບຸນຄໍາ ✦">
-            </div>
-            <button class="mini-btn gold" id="saveBrandTextBtn" type="button">ບັນທຶກ</button>
-          </div>
-          <div class="admin-status" id="brandTextStatus"></div>
         </div>
       </details>
       <div class="admin-row">
@@ -756,6 +702,16 @@
         <div class="stub-line banned"><span class="lbl">ຖືກເລກ 2 ໂຕ ລ່າງ</span><span class="val mono" id="win2bAmount">0</span></div>
         <div class="stub-line hero"><span class="lbl">ລວມຈ່າຍລາງວັນ</span><span class="val mono" id="totalWinAmount">0</span></div>
         <button type="button" class="copy-btn" id="copySummaryBtn">📋 ກັອບປີ້ຂໍ້ຄວາມໃບສະຫລຸບ (WhatsApp / Line)</button>
+      </div>
+
+      <div class="stub" style="margin-top:14px;">
+        <div class="stub-title mono">🧾 ອອກບີນ</div>
+        <p style="font-size:13px;opacity:.75;margin:4px 0 12px;">
+          ອອກບີນລະອຽດຄົບທຸກຊຸດເລກ+ລາຄາ ຈາກຍອດທີ່ຄິດໄລ່ລ່າສຸດ ພ້ອມເລກທີ່ບີນປະຈຳວັນ ແລະ ສົ່ງລາຍລະອຽດເຂົ້າ Google Sheet ທັນທີ.
+        </p>
+        <button type="button" class="btn" id="issueBillBtn">🖨 ອອກເລກ 1 ບີນ</button>
+        <div class="admin-status" id="billStatus"></div>
+        <div id="billReceiptWrap" style="margin-top:12px;"></div>
       </div>
 
       <details open>
@@ -867,40 +823,6 @@
     return gsPost({ token: CONFIG.SHARED_TOKEN, action:'setAdminPassword', controlSheetUrl: CONFIG.CONTROL_SHEET_URL, password: pw })
       .then(function(res){
         if(res && res.ok) setAdminPasswordCache(pw);
-        return res;
-      });
-  }
-
-  // ---------- ລາຍເຊັນ/ໂລໂກຂໍ້ຄວາມ (watermark) ----------
-  // ຂໍ້ຄວາມນີ້ຈະຖືກຕໍ່ທ້າຍ/ໃສ່ຫົວ ໃນຂໍ້ຄວາມ "ໃບສະຫລຸບ" ທີ່ກັອບປີ້ ແລະ ໃນໃບບີນທີ່ອອກ —
-  // ຄືກັນກັບລະຫັດ Admin: ຖ້າ CONTROL_ENABLED ຈະຊິ້ງຂ້າມອຸປະກອນ, ຖ້າບໍ່ ຈະເກັບໄວ້ໃນເຄື່ອງນີ້ຢ່າງດຽວ.
-  var BRAND_KEY = 'laoLotteryBrandTextLocal_v1';
-  var DEFAULT_BRAND_TEXT = '✦ ຕູ້ຄິດໄລ່ຫວຍ ✦';
-  function getBrandTextCached(){
-    try{
-      var stored = localStorage.getItem(BRAND_KEY);
-      return (stored !== null && stored !== undefined) ? stored : DEFAULT_BRAND_TEXT;
-    }catch(e){ return DEFAULT_BRAND_TEXT; }
-  }
-  function setBrandTextCache(t){
-    try{ localStorage.setItem(BRAND_KEY, t); return true; }catch(e){ return false; }
-  }
-  function refreshBrandText(){
-    if(!CONTROL_ENABLED) return Promise.resolve(getBrandTextCached());
-    return gsPost({ token: CONFIG.SHARED_TOKEN, action:'getBrandText', controlSheetUrl: CONFIG.CONTROL_SHEET_URL })
-      .then(function(res){
-        if(res && res.ok && typeof res.brandText === 'string'){ setBrandTextCache(res.brandText); return res.brandText; }
-        return getBrandTextCached();
-      })
-      .catch(function(){ return getBrandTextCached(); });
-  }
-  function setBrandText(t){
-    if(!CONTROL_ENABLED){
-      return Promise.resolve(setBrandTextCache(t) ? { ok:true } : { ok:false, error:'ບັນທຶກໃນເຄື່ອງນີ້ບໍ່ໄດ້' });
-    }
-    return gsPost({ token: CONFIG.SHARED_TOKEN, action:'setBrandText', controlSheetUrl: CONFIG.CONTROL_SHEET_URL, brandText: t })
-      .then(function(res){
-        if(res && res.ok) setBrandTextCache(t);
         return res;
       });
   }
@@ -1201,26 +1123,6 @@
       });
     }
 
-    var saveBrandBtn = document.getElementById('saveBrandTextBtn');
-    var brandStatus = document.getElementById('brandTextStatus');
-    var brandInput = document.getElementById('newBrandText');
-    if(brandInput) brandInput.value = getBrandTextCached();
-    if(saveBrandBtn){
-      saveBrandBtn.addEventListener('click', function(){
-        var val = brandInput ? brandInput.value : '';
-        if(brandStatus) brandStatus.textContent = 'ກຳລັງບັນທຶກ...';
-        setBrandText(val).then(function(res){
-          if(res && res.ok){
-            if(brandStatus) brandStatus.textContent = 'ບັນທຶກສຳເລັດ ✓' + (CONTROL_ENABLED ? ' — ໃຊ້ໄດ້ທຸກອຸປະກອນທັນທີ' : ' — ໃຊ້ໄດ້ສະເພາະອຸປະກອນນີ້');
-          } else {
-            if(brandStatus) brandStatus.textContent = 'ບັນທຶກບໍ່ໄດ້: ' + (res && res.error ? res.error : 'ບໍ່ຮູ້ສາເຫດ');
-          }
-        }).catch(function(err){
-          if(brandStatus) brandStatus.textContent = 'ບັນທຶກບໍ່ໄດ້: ' + (err && err.message ? err.message : String(err));
-        });
-      });
-    }
-
     var addUserBtn = document.getElementById('addUserBtn');
     var adminStatus = document.getElementById('adminStatus');
     if(addUserBtn){
@@ -1319,55 +1221,10 @@
     }
   }
 
-  // ---------- send-total: push the running total (stake sales, commission split, and
-  // computed prize payouts) into the user's own Google Sheet ("No1." dashboard cells) ----------
-  function sendTotalNow(){
-    if(!currentUser || !currentUser.sheetUrl){
-      return Promise.resolve({ ok:false, error:'ຜູ້ໃຊ້ນີ້ຍັງບໍ່ໄດ້ຕັ້ງ Google Sheet — ໄປຕັ້ງຄ່າໃນ ⚙ ຈັດການຜູ້ໃຊ້ (Admin) ກ່ອນ' });
-    }
-    if(!lastTotalAll || lastTotalAll <= 0){
-      return Promise.resolve({ ok:false, error:'ຍັງບໍ່ມີຍອດລວມ — ກົດ "ຄິດໄລ່ຍອດ" ກ່ອນ' });
-    }
-    if(!/\/exec$/.test((CONFIG.WEBAPP_URL||'').trim())){
-      return Promise.resolve({ ok:false, error:'CONFIG.WEBAPP_URL ຢູ່ຫົວໄຟລ໌ index.html ຕ້ອງລົງທ້າຍດ້ວຍ /exec (ບໍ່ແມ່ນ /dev ຫຼືລິ້ງອື່ນ)' });
-    }
-    var pct = parseFloat(document.getElementById('pctInput').value) || 0;
-    return gsPost({
-      action: 'sendTotal',
-      token: CONFIG.SHARED_TOKEN,
-      sheetUrl: currentUser.sheetUrl,
-      sheetTab: CONFIG.SHEET_TAB,
-      startRow: CONFIG.START_ROW,
-      colIndex: CONFIG.COL_INDEX,
-      colNumber: CONFIG.COL_NUMBER,
-      colPrice: CONFIG.COL_PRICE,
-      totalAll: lastTotalAll,
-      dashboard: {
-        totalAll: lastTotalAll,
-        pct: pct,
-        totalReceive: lastTotalAll * (pct/100),
-        totalSend: lastTotalAll - (lastTotalAll * (pct/100)),
-        win2: lastWinResult.win2Amount,
-        win3: lastWinResult.win3Amount,
-        win2Bottom: lastWinResult.win2BottomAmount,
-        totalWin: lastWinResult.total
-      },
-      dashboardCells: CONFIG.DASHBOARD_CELLS
-    }).then(function(res){
-      if(res && res.ok){
-        return { ok:true, note: 'ສົ່ງຍອດລວມ ' + lastTotalAll.toLocaleString() + ' ເຂົ້າຊີດຂອງ ' + currentUser.username + ' ແລ້ວ' };
-      }
-      return { ok:false, error: (res && res.error) ? res.error : 'ບໍ່ຮູ້ສາເຫດ' };
-    }).catch(function(err){
-      var msg = err && err.message ? err.message : String(err);
-      if(/Failed to fetch|NetworkError|Load failed|TypeError/i.test(msg)){
-        msg += ' — ອາດເປັນຍ້ອນບໍ່ມີອິນເຕີເນັດ, URL ໃນ CONFIG.WEBAPP_URL ພິມຜິດ, ຫຼື Apps Script ຍັງບໍ່ໄດ້ Deploy ເປັນ Web App';
-      }
-      return { ok:false, error: msg };
-    });
-  }
-
-  // ---------- ປຸ່ມລວມ: ກົດເທື່ອດຽວ = ສົ່ງຍອດລວມ + ອອກບີນ + ກັອບປີ້ຂໍ້ຄວາມໃບສະຫລຸບ ----------
+  // ---------- send-total panel: only one action now — push the running total
+  // (stake sales, commission split, and computed prize payouts) into the
+  // user's own Google Sheet, combining "dashboard" style stats onto the
+  // same "No1." tab via CONFIG.DASHBOARD_CELLS ----------
   function initSheetPanel(){
     var panel = document.getElementById('quickSheetPanel');
     var status = document.getElementById('sheetStatus');
@@ -1376,45 +1233,55 @@
       return;
     }
 
-    var toggleBtn = document.getElementById('toggleBillBtn');
-    var receiptWrap = document.getElementById('billReceiptWrap');
-    if(toggleBtn && receiptWrap){
-      toggleBtn.addEventListener('click', function(){
-        var showing = receiptWrap.style.display !== 'none';
-        receiptWrap.style.display = showing ? 'none' : 'block';
-        toggleBtn.textContent = showing ? '🧾 ເບິ່ງໃບບີນ' : '🧾 ເຊື່ອງໃບບີນ';
-      });
-    }
-
-    var comboBtn = document.getElementById('sheetSendAllBtn');
-    if(comboBtn){
-      comboBtn.addEventListener('click', function(){
-        if(!lastRows || lastRows.length === 0 || !lastTotalAll || lastTotalAll <= 0){
-          status.textContent = 'ຍັງບໍ່ມີຍອດ — ພິມຊຸດເລກ ແລະ ກົດ "ຄິດໄລ່ຍອດ" ກ່ອນ';
+    var sendAllBtn = document.getElementById('sheetSendAllBtn');
+    if(sendAllBtn){
+      sendAllBtn.addEventListener('click', function(){
+        if(!currentUser || !currentUser.sheetUrl){
+          status.textContent = 'ຜູ້ໃຊ້ນີ້ຍັງບໍ່ໄດ້ຕັ້ງ Google Sheet — ໄປຕັ້ງຄ່າໃນ ⚙ ຈັດການຜູ້ໃຊ້ (Admin) ກ່ອນ';
           return;
         }
-        comboBtn.disabled = true;
-        status.textContent = 'ກຳລັງດຳເນີນການ...';
-        sendTotalNow().then(function(sendRes){
-          return issueBillNow().then(function(billRes){
-            return { sendRes: sendRes, billRes: billRes };
-          });
-        }).then(function(results){
-          var text = buildSummaryText();
-          copyTextToClipboard(text, function(copyOk){
-            comboBtn.disabled = false;
-            var parts = [
-              '<span title="' + escapeHtml(results.sendRes.ok ? (results.sendRes.note||'') : results.sendRes.error) + '">' + (results.sendRes.ok ? '✅ສົ່ງ' : '❌ສົ່ງ') + '</span>',
-              '<span title="' + escapeHtml(results.billRes.ok ? ('ບີນ #' + results.billRes.billNo) : results.billRes.error) + '">' + (results.billRes.ok ? '✅ບີນ#' + results.billRes.billNo : '❌ບີນ') + '</span>',
-              '<span>' + (copyOk ? '✅ກັອບປີ້' : '❌ກັອບປີ້') + '</span>'
-            ];
-            status.innerHTML = parts.join(' &nbsp;·&nbsp; ');
-            if(toggleBtn){
-              toggleBtn.style.display = results.billRes.ok ? 'inline-block' : 'none';
-              toggleBtn.textContent = '🧾 ເບິ່ງໃບບີນ';
-            }
-            if(receiptWrap) receiptWrap.style.display = 'none';
-          });
+        if(!lastTotalAll || lastTotalAll <= 0){
+          status.textContent = 'ຍັງບໍ່ມີຍອດລວມ — ກົດ "ຄິດໄລ່ຍອດ" ກ່ອນ';
+          return;
+        }
+        if(!/\/exec$/.test(CONFIG.WEBAPP_URL.trim())){
+          status.textContent = 'CONFIG.WEBAPP_URL ຢູ່ຫົວໄຟລ໌ index.html ຕ້ອງລົງທ້າຍດ້ວຍ /exec (ບໍ່ແມ່ນ /dev ຫຼືລິ້ງອື່ນ) — ໄປ Deploy > Manage deployments ເພື່ອກັອບປີ້ URL ທີ່ຖືກຕ້ອງ';
+          return;
+        }
+        status.textContent = 'ກຳລັງສົ່ງຍອດລວມໄປ Google Sheet ຂອງ ' + currentUser.username + '...';
+        gsPost({
+          action: 'sendTotal',
+          token: CONFIG.SHARED_TOKEN,
+          sheetUrl: currentUser.sheetUrl,
+          sheetTab: CONFIG.SHEET_TAB,
+          startRow: CONFIG.START_ROW,
+          colIndex: CONFIG.COL_INDEX,
+          colNumber: CONFIG.COL_NUMBER,
+          colPrice: CONFIG.COL_PRICE,
+          totalAll: lastTotalAll,
+          dashboard: {
+            totalAll: lastTotalAll,
+            pct: parseFloat(document.getElementById('pctInput').value) || 0,
+            totalReceive: lastTotalAll * ((parseFloat(document.getElementById('pctInput').value) || 0) / 100),
+            totalSend: lastTotalAll - (lastTotalAll * ((parseFloat(document.getElementById('pctInput').value) || 0) / 100)),
+            win2: lastWinResult.win2Amount,
+            win3: lastWinResult.win3Amount,
+            win2Bottom: lastWinResult.win2BottomAmount,
+            totalWin: lastWinResult.total
+          },
+          dashboardCells: CONFIG.DASHBOARD_CELLS
+        }).then(function(res){
+          if(res && res.ok){
+            status.textContent = 'ສົ່ງຍອດລວມ ' + lastTotalAll.toLocaleString() + ' ເຂົ້າຊີດຂອງ ' + currentUser.username + ' ແລ້ວ ✓';
+          } else {
+            status.textContent = 'ຜິດພາດ: ' + (res && res.error ? res.error : 'ບໍ່ຮູ້ສາເຫດ');
+          }
+        }).catch(function(err){
+          var msg = err && err.message ? err.message : String(err);
+          if(/Failed to fetch|NetworkError|Load failed|TypeError/i.test(msg)){
+            msg += ' — ອາດເປັນຍ້ອນບໍ່ມີອິນເຕີເນັດ, URL ໃນ CONFIG.WEBAPP_URL ພິມຜິດ, ຫຼື Apps Script ຍັງບໍ່ໄດ້ Deploy ເປັນ Web App';
+          }
+          status.textContent = 'ຜິດພາດ: ' + msg;
         });
       });
     }
@@ -1431,8 +1298,8 @@
     return '#' + p(d.getDate()) + p(d.getMonth()+1) + d.getFullYear() + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
   }
 
-  // ---------- ອອກບີນ (issue bill): ດຶງລາຍລະອຽດ "ດິບ" (ຄືກັນກັບຕາຕະລາງ "ລາຍລະອຽດແຕ່ລະແຖວ")
-  // ຈາກຍອດທີ່ຄິດໄລ່ລ່າສຸດ (lastRows) — ແຕ່ລະເລກເປັນລາຍການແຍກກັນ, ຕັດເລກຫ້າມອອກ. ----------
+  // ---------- ອອກບີນ (issue bill): ຮວບຮວມທຸກຊຸດເລກ+ລາຄາຈາກຍອດທີ່ຄິດໄລ່ລ່າສຸດ (lastRows)
+  // ໃຫ້ເປັນລາຍການບີນລະອຽດ (ຄືແຕ່ລະແຖວ raw ທີ່ພິມໄວ້) ພ້ອມລວມລາຄາຂອງແຖວນັ້ນ ----------
   function pad2(n){ n = String(n); return n.length < 2 ? '0'+n : n; }
   function billDateStr(d){
     d = d || new Date();
@@ -1447,7 +1314,7 @@
     return pad2(d.getDate()) + '/' + pad2(d.getMonth()+1) + '/' + d.getFullYear();
   }
 
-  function buildBillLineGroups(){
+  function buildBillItems(){
     var order = [];
     var map = {};
     for(var i=0;i<lastRows.length;i++){
@@ -1455,7 +1322,7 @@
       if(r.banned) continue; // ເລກຫ້າມ ບໍ່ນັບເຂົ້າບີນ
       var key = r.lineNo + '|' + r.raw;
       if(!map[key]){
-        map[key] = { lineNo: r.lineNo, raw: r.raw, numbers: [], total: 0 };
+        map[key] = { raw: r.raw, numbers: [], unitValue: r.unitValue, total: 0 };
         order.push(key);
       }
       var g = map[key];
@@ -1476,78 +1343,81 @@
     return n;
   }
 
-  // ໃບບີນແບບຕີ້ຄິດ (ຄ້າຍໃບຫວຍທົ່ວໄປ): ຫົວ ​+ ເລກທີ່ບີນ/ວັນທີ + ຕາຕະລາງ 2 ຄໍ (ຊຸດເລກ | ລາຄາ) + ລວມ + ລາຍເຊັນ
   function renderBillReceipt(bill){
     var wrap = document.getElementById('billReceiptWrap');
     if(!wrap) return;
-    var brand = getBrandTextCached();
-    var cellsHtml = bill.groups.map(function(g){
-      return '<div class="bill-item">' +
-        '<span class="bill-item-nums mono">' + escapeHtml(g.numbers.join(' ')) + '</span>' +
-        '<span class="bill-item-price mono">' + KIP(g.total) + '</span>' +
-      '</div>';
+    var itemsHtml = bill.items.map(function(it){
+      return '<div class="stub-line"><span class="lbl mono" style="max-width:70%;white-space:normal;">' +
+        escapeHtml(it.numbers.join(' ')) + '</span><span class="val mono">' + KIP(it.total) + '</span></div>';
     }).join('');
     wrap.innerHTML =
-      '<div class="bill-ticket">' +
-        (brand ? '<div class="bill-brand">' + escapeHtml(brand) + '</div>' : '') +
-        '<div class="bill-head">' +
-          '<div class="bill-head-row"><span>ບີນເລກທີ</span><b class="mono">' + escapeHtml(String(bill.billNo)) + ' / ' + escapeHtml(bill.dateLabel) + '</b></div>' +
-          '<div class="bill-head-row"><span>ເວລາ</span><b class="mono">' + escapeHtml(bill.dateLabel) + ' ' + escapeHtml(bill.timeStr) + '</b></div>' +
-          '<div class="bill-head-row"><span>ຜູ້ອອກບີນ</span><b class="mono">' + escapeHtml(bill.username) + '</b></div>' +
-        '</div>' +
-        '<div class="bill-grid">' + cellsHtml + '</div>' +
-        '<div class="bill-total"><span>ລວມລາຄາທັງໝົດ</span><b class="mono">' + KIP(bill.totalAll) + ' ກີບ</b></div>' +
-        (brand ? '<div class="bill-brand" style="opacity:.6;font-size:12px;">' + escapeHtml(brand) + '</div>' : '') +
+      '<div class="stub" style="border-color:var(--gold, #d4af37);">' +
+        '<div class="stub-line hero"><span class="lbl">ບີນເລກທີ</span><span class="val mono">' + escapeHtml(String(bill.billNo)) + '/' + escapeHtml(bill.dateLabel) + '</span></div>' +
+        '<div class="stub-line"><span class="lbl">ເວລາອອກບີນ</span><span class="val mono">' + escapeHtml(bill.dateLabel) + ' ' + escapeHtml(bill.timeStr) + '</span></div>' +
+        '<div class="stub-line"><span class="lbl">ຜູ້ອອກບີນ</span><span class="val mono">' + escapeHtml(bill.username) + '</span></div>' +
+        '<hr style="border-color:var(--line-soft);margin:8px 0;">' +
+        itemsHtml +
+        '<div class="stub-line hero"><span class="lbl">ລວມລາຄາທັງໝົດ</span><span class="val mono">' + KIP(bill.totalAll) + '</span></div>' +
       '</div>';
   }
 
-  // ອອກບີນ + ຂຽນເຂົ້າ Google Sheet (ຖ້າຕັ້ງໄວ້) — ຄືນ Promise ທີ່ resolve ດ້ວຍ { ok, billNo, ... }
-  // ບໍ່ວ່າຈະສົ່ງເຂົ້າ Sheet ໄດ້ຫຼືບໍ່ (ອອກບີນທ້ອງຖິ່ນສະເໝີເປັນທາງເລືອກສຳຮອງ) — ໃຫ້ combo action ຂ້າງລຸ່ມນຳໄປໃຊ້ຮ່ວມກັບການສົ່ງຍອດ ແລະ ກັອບປີ້.
-  function issueBillNow(){
-    if(!lastRows || lastRows.length === 0 || !lastTotalAll || lastTotalAll <= 0){
-      return Promise.resolve({ ok:false, error:'ຍັງບໍ່ມີຍອດ — ພິມຊຸດເລກ ແລະ ກົດ "ຄິດໄລ່ຍອດ" ກ່ອນອອກບີນ' });
-    }
-    var groups = buildBillLineGroups();
-    if(groups.length === 0){
-      return Promise.resolve({ ok:false, error:'ບໍ່ມີລາຍການທີ່ອອກບີນໄດ້ (ອາດຖືກຕັດອອກໝົດ)' });
-    }
-    var now = new Date();
-    var dateStr = billDateStr(now);
-    var dateLabel = billDateLabel(now);
-    var timeStr = billTimeStr(now);
-    var username = currentUser ? currentUser.username : 'guest';
-    var canSendToSheet = SHEETS_ENABLED && currentUser && currentUser.sheetUrl && /\/exec$/.test((CONFIG.WEBAPP_URL||'').trim());
-
-    if(!canSendToSheet){
-      var billNoLocal = nextLocalBillNo(dateStr);
-      var billLocal = { billNo: billNoLocal, dateLabel: dateLabel, timeStr: timeStr, username: username, groups: groups, totalAll: lastTotalAll };
-      renderBillReceipt(billLocal);
-      return Promise.resolve({
-        ok:true, billNo: billNoLocal, sentToSheet: false,
-        note: currentUser && currentUser.sheetUrl
-          ? 'ອອກບີນ #' + billNoLocal + ' (ນັບຢູ່ອຸປະກອນນີ້ — ບໍ່ໄດ້ສົ່ງເຂົ້າ Sheet ຍ້ອນ URL Apps Script ຍັງບໍ່ຖືກຕ້ອງ)'
-          : 'ອອກບີນ #' + billNoLocal + ' (ນັບຢູ່ອຸປະກອນນີ້ — ຜູ້ໃຊ້ນີ້ຍັງບໍ່ໄດ້ຕັ້ງ Google Sheet, ບໍ່ໄດ້ສົ່ງອອກໄປໃສ)'
-      });
-    }
-
-    return gsPost({
-      action: 'issueBill',
-      token: CONFIG.SHARED_TOKEN,
-      sheetUrl: currentUser.sheetUrl,
-      billTab: 'Bills',
-      dateStr: dateStr,
-      timeStr: timeStr,
-      username: username,
-      lineGroups: groups.map(function(g){ return { lineNo: g.lineNo, raw: g.raw, numbers: g.numbers.join(' '), total: g.total }; })
-    }).then(function(res){
-      if(res && res.ok){
-        var bill = { billNo: res.billNo, dateLabel: dateLabel, timeStr: timeStr, username: username, groups: groups, totalAll: lastTotalAll };
-        renderBillReceipt(bill);
-        return { ok:true, billNo: res.billNo, sentToSheet: true, note: 'ອອກບີນ #' + res.billNo };
+  function initBillPanel(){
+    var btn = document.getElementById('issueBillBtn');
+    var status = document.getElementById('billStatus');
+    if(!btn) return;
+    btn.addEventListener('click', function(){
+      if(!lastRows || lastRows.length === 0 || !lastTotalAll || lastTotalAll <= 0){
+        if(status) status.textContent = 'ຍັງບໍ່ມີຍອດ — ພິມຊຸດເລກ ແລະ ກົດ "ຄິດໄລ່ຍອດ" ກ່ອນອອກບີນ';
+        return;
       }
-      return { ok:false, error: (res && res.error) ? res.error : 'ບໍ່ຮູ້ສາເຫດ' };
-    }).catch(function(err){
-      return { ok:false, error: err && err.message ? err.message : String(err) };
+      var items = buildBillItems();
+      if(items.length === 0){
+        if(status) status.textContent = 'ບໍ່ມີລາຍການທີ່ອອກບີນໄດ້ (ອາດຖືກຕັດອອກໝົດ)';
+        return;
+      }
+      var now = new Date();
+      var dateStr = billDateStr(now);
+      var dateLabel = billDateLabel(now);
+      var timeStr = billTimeStr(now);
+      var username = currentUser ? currentUser.username : 'guest';
+
+      var canSendToSheet = SHEETS_ENABLED && currentUser && currentUser.sheetUrl && /\/exec$/.test((CONFIG.WEBAPP_URL||'').trim());
+
+      if(!canSendToSheet){
+        var billNoLocal = nextLocalBillNo(dateStr);
+        renderBillReceipt({ billNo: billNoLocal, dateLabel: dateLabel, timeStr: timeStr, username: username, items: items, totalAll: lastTotalAll });
+        if(status) status.textContent = currentUser && currentUser.sheetUrl
+          ? 'ອອກບີນ #' + billNoLocal + ' ແລ້ວ (ນັບຢູ່ອຸປະກອນນີ້ — ບໍ່ໄດ້ສົ່ງເຂົ້າ Sheet ຍ້ອນ URL Apps Script ຍັງບໍ່ຖືກຕ້ອງ)'
+          : 'ອອກບີນ #' + billNoLocal + ' ແລ້ວ (ນັບຢູ່ອຸປະກອນນີ້ — ຜູ້ໃຊ້ນີ້ຍັງບໍ່ໄດ້ຕັ້ງ Google Sheet ໃນ Admin, ບໍ່ໄດ້ສົ່ງອອກໄປໃສ)';
+        return;
+      }
+
+      if(status) status.textContent = 'ກຳລັງອອກບີນ ແລະ ສົ່ງເຂົ້າ Google Sheet...';
+      btn.disabled = true;
+      gsPost({
+        action: 'issueBill',
+        token: CONFIG.SHARED_TOKEN,
+        sheetUrl: currentUser.sheetUrl,
+        billTab: 'Bills',
+        dateStr: dateStr,
+        dateLabel: dateLabel,
+        timeStr: timeStr,
+        username: username,
+        totalAll: lastTotalAll,
+        itemsText: items.map(function(it){ return it.raw + '  ⇒  ' + it.numbers.join(' ') + '  =  ' + KIP(it.total); }).join('\n')
+      }).then(function(res){
+        btn.disabled = false;
+        if(res && res.ok){
+          renderBillReceipt({ billNo: res.billNo, dateLabel: dateLabel, timeStr: timeStr, username: username, items: items, totalAll: lastTotalAll });
+          if(status) status.textContent = 'ອອກບີນ #' + res.billNo + ' ແລະ ສົ່ງເຂົ້າ Sheet ຂອງ ' + username + ' ແລ້ວ ✓';
+        } else {
+          if(status) status.textContent = 'ອອກບີນບໍ່ສຳເລັດ: ' + (res && res.error ? res.error : 'ບໍ່ຮູ້ສາເຫດ');
+        }
+      }).catch(function(err){
+        btn.disabled = false;
+        var msg = err && err.message ? err.message : String(err);
+        if(status) status.textContent = 'ອອກບີນບໍ່ສຳເລັດ: ' + msg;
+      });
     });
   }
 
@@ -2113,39 +1983,35 @@
   }
 
   // ---------- receipt-card copy ----------
-  function buildSummaryText(){
-    var winInputs = readWinInputs();
-    var brand = getBrandTextCached();
-    var lines = [];
-    if(brand) lines.push(brand);
-    lines.push('🧾 ໃບສະຫລຸບ ' + nowStamp());
-    lines.push('ລວມຍອດ: ' + document.getElementById('totalAll').textContent);
-    lines.push('ຍອດຕັດອອກ: ' + document.getElementById('totalBanned').textContent);
-    lines.push('%ທີ່ໄດ້: ' + (document.getElementById('pctInput').value || 0) + '%');
-    lines.push('ຍອດຮັບ ( ຄອມມິຊັນ ): ' + document.getElementById('totalReceive').textContent);
-    lines.push('ຍອດສົ່ງ: ' + document.getElementById('totalSend').textContent);
-    lines.push('ຖືກເລກ 2 ໂຕ' + (winInputs.n2 ? ' (' + winInputs.n2 + ')' : '') + ': ' + document.getElementById('win2Amount').textContent);
-    lines.push('ຖືກເລກ 3 ໂຕ' + (winInputs.n3 ? ' (' + winInputs.n3 + ')' : '') + ': ' + document.getElementById('win3Amount').textContent);
-    lines.push('ຖືກເລກ 2 ໂຕ ລ່າງ' + (winInputs.n2b ? ' (' + winInputs.n2b + ')' : '') + ': ' + document.getElementById('win2bAmount').textContent);
-    lines.push('ລວມຈ່າຍລາງວັນ: ' + document.getElementById('totalWinAmount').textContent);
-
-    // ລາຍລະອຽດເລກທີ່ຖືກລາງວັນແຕ່ລະໂຕ (ຖ້າມີ)
-    var detailRows = (lastWinResult.win2Rows || []).map(function(x){ return '  • ' + x.number + ' (2ໂຕ ບົນ) ' + KIP(x.stake) + ' → ' + KIP(x.amount) + ' ກີບ'; })
-      .concat((lastWinResult.win3Rows || []).map(function(x){ return '  • ' + x.number + ' (3ໂຕ) ' + KIP(x.stake) + ' → ' + KIP(x.amount) + ' ກີບ'; }))
-      .concat((lastWinResult.win2BRows || []).map(function(x){ return '  • ' + x.number + ' (2ໂຕ ລ່າງ) ' + KIP(x.stake) + ' → ' + KIP(x.amount) + ' ກີບ'; }));
-    if(detailRows.length > 0){
-      lines.push('—— ລາຍລະອຽດເລກຖືກ ——');
-      lines = lines.concat(detailRows);
-    }
-    if(brand) lines.push(brand);
-    return lines.join('\n');
-  }
-
   function initCopySummary(){
     var btn = document.getElementById('copySummaryBtn');
     if(!btn) return;
     btn.addEventListener('click', function(){
-      copyTextToClipboard(buildSummaryText(), function(ok){
+      var winInputs = readWinInputs();
+      var lines = [
+        '🧾 ໃບສະຫລຸບ ' + nowStamp(),
+        'ລວມຍອດ: ' + document.getElementById('totalAll').textContent,
+        'ຍອດຕັດອອກ: ' + document.getElementById('totalBanned').textContent,
+        '%ທີ່ໄດ້: ' + (document.getElementById('pctInput').value || 0) + '%',
+        'ຍອດຮັບ ( ຄອມມິຊັນ ): ' + document.getElementById('totalReceive').textContent,
+        'ຍອດສົ່ງ: ' + document.getElementById('totalSend').textContent,
+        'ຖືກເລກ 2 ໂຕ' + (winInputs.n2 ? ' (' + winInputs.n2 + ')' : '') + ': ' + document.getElementById('win2Amount').textContent,
+        'ຖືກເລກ 3 ໂຕ' + (winInputs.n3 ? ' (' + winInputs.n3 + ')' : '') + ': ' + document.getElementById('win3Amount').textContent,
+        'ຖືກເລກ 2 ໂຕ ລ່າງ' + (winInputs.n2b ? ' (' + winInputs.n2b + ')' : '') + ': ' + document.getElementById('win2bAmount').textContent,
+        'ລວມຈ່າຍລາງວັນ: ' + document.getElementById('totalWinAmount').textContent
+      ];
+
+      // ລາຍລະອຽດເລກທີ່ຖືກລາງວັນແຕ່ລະໂຕ (ຖ້າມີ)
+      var detailRows = (lastWinResult.win2Rows || []).map(function(x){ return '  • ' + x.number + ' (2ໂຕ ບົນ) ' + KIP(x.stake) + ' → ' + KIP(x.amount) + ' ກີບ'; })
+        .concat((lastWinResult.win3Rows || []).map(function(x){ return '  • ' + x.number + ' (3ໂຕ) ' + KIP(x.stake) + ' → ' + KIP(x.amount) + ' ກີບ'; }))
+        .concat((lastWinResult.win2BRows || []).map(function(x){ return '  • ' + x.number + ' (2ໂຕ ລ່າງ) ' + KIP(x.stake) + ' → ' + KIP(x.amount) + ' ກີບ'; }));
+      if(detailRows.length > 0){
+        lines.push('—— ລາຍລະອຽດເລກຖືກ ——');
+        lines = lines.concat(detailRows);
+      }
+
+      var text = lines.join('\n');
+      copyTextToClipboard(text, function(ok){
         if(ok) flashCopied(btn, '✅ ກັອບປີ້ແລ້ວ — ວາງໄດ້ເລີຍ', '📋 ກັອບປີ້ຂໍ້ຄວາມໃບສະຫລຸບ (WhatsApp / Line)');
         else { btn.textContent = 'ກັອບປີ້ບໍ່ໄດ້ — ລອງໃໝ່'; setTimeout(function(){ btn.textContent = '📋 ກັອບປີ້ຂໍ້ຄວາມໃບສະຫລຸບ (WhatsApp / Line)'; }, 1800); }
       });
@@ -2199,8 +2065,6 @@
     '    if(body.action === "saveUsers") return json_(saveUsers_(body));',
     '    if(body.action === "getAdminPassword") return json_(getAdminPassword_(body));',
     '    if(body.action === "setAdminPassword") return json_(setAdminPassword_(body));',
-    '    if(body.action === "getBrandText") return json_(getBrandText_(body));',
-    '    if(body.action === "setBrandText") return json_(setBrandText_(body));',
     '    return json_({ ok:false, error:"unknown action" });',
     '  }catch(err){',
     '    // ຄືນ JSON ສະເໝີ — ຖ້າປ່ອຍໃຫ້ exception ຫລຸດອອກໄປ Google ຈະສົ່ງໜ້າ HTML error ກັບຄືນ',
@@ -2275,33 +2139,23 @@
     '    var sh = ss.getSheetByName(tabName);',
     '    if(!sh){',
     '      sh = ss.insertSheet(tabName);',
-    '      sh.getRange(1,1,1,8).setValues([["ວັນທີ","ເວລາ","ເລກທີ່ບີນ","ຜູ້ໃຊ້","ຂໍ້ຄວາມທີ່ພິມ","ເລກ (ຊຸດ)","ລວມລາຄາແຖວ","ຄົ້ນຫາເລກ (ຕື່ມພາຍຫລັງ)"]]);',
+    '      sh.getRange(1,1,1,6).setValues([["ວັນທີ","ເວລາ","ເລກທີ່ບີນ","ຜູ້ໃຊ້","ລາຍລະອຽດ","ລວມລາຄາ"]]);',
     '    }',
-    '    var lineGroups = body.lineGroups || [];',
-    '    if(lineGroups.length === 0) return { ok:false, error:"ບໍ່ມີລາຍການໃຫ້ອອກບີນ" };',
     '    var lastRow = sh.getLastRow();',
-    '    // ນັບເລກທີ່ບີນ = ຄ່າສູງສຸດຂອງ "ເລກທີ່ບີນ" (ຄໍ C) ໃນວັນດຽວກັນ +1 — ໃຊ້ MAX ບໍ່ແມ່ນນັບແຖວ',
-    '    // ຍ້ອນ 1 ບີນ ອາດມີຫລາຍແຖວ (ແຖວລະ 1 ຊຸດເລກທີ່ພິມ).',
     '    var billNo = 1;',
     '    if(lastRow >= 2){',
-    '      var scanRows = sh.getRange(2,1,lastRow-1,3).getValues(); // A=ວັນທີ, C=ເລກທີ່ບີນ',
-    '      var maxNo = 0;',
-    '      for(var i=0;i<scanRows.length;i++){',
-    '        if(String(scanRows[i][0]) === String(body.dateStr)){',
-    '          var n = Number(scanRows[i][2]) || 0;',
-    '          if(n > maxNo) maxNo = n;',
-    '        }',
+    '      var dateCol = sh.getRange(2,1,lastRow-1,1).getValues();',
+    '      var count = 0;',
+    '      for(var i=0;i<dateCol.length;i++){',
+    '        if(String(dateCol[i][0]) === String(body.dateStr)) count++;',
     '      }',
-    '      billNo = maxNo + 1;',
+    '      billNo = count + 1;',
     '    }',
-    '    var outRows = lineGroups.map(function(g){',
-    '      return [',
-    '        body.dateStr || "", body.timeStr || "", billNo, body.username || "",',
-    '        g.raw || "", g.numbers || "", g.total || 0, ""',
-    '      ];',
-    '    });',
-    '    sh.getRange(lastRow+1, 1, outRows.length, 8).setValues(outRows);',
-    '    return { ok:true, billNo: billNo, rowsWritten: outRows.length };',
+    '    var newRow = lastRow + 1;',
+    '    sh.getRange(newRow,1,1,6).setValues([[',
+    '      body.dateStr || "", body.timeStr || "", billNo, body.username || "", body.itemsText || "", body.totalAll || 0',
+    '    ]]);',
+    '    return { ok:true, billNo: billNo, row: newRow };',
     '  }catch(err){',
     '    return { ok:false, error:"ອອກບີນບໍ່ສຳເລັດ: " + String(err && err.message ? err.message : err) };',
     '  }',
@@ -2398,55 +2252,6 @@
     '    return { ok:true };',
     '  }catch(err){',
     '    return { ok:false, error:"ບັນທຶກລະຫັດ Admin ບໍ່ສຳເລັດ: " + String(err && err.message ? err.message : err) };',
-    '  }',
-    '}',
-    '',
-    '// ອ່ານ/ບັນທຶກຄ່າ key/value ໃນແທັບ Config ແບບທົ່ວໄປ (ໃຊ້ຮ່ວມກັນລະຫວ່າງ adminPassword ແລະ brandText)',
-    'function getConfigValue_(controlSheetUrl, key){',
-    '  var sh = getControlSheet_(controlSheetUrl, "Config", ["key","value"]);',
-    '  var lastRow = sh.getLastRow();',
-    '  if(lastRow >= 2){',
-    '    var values = sh.getRange(2,1,lastRow-1,2).getValues();',
-    '    for(var i=0;i<values.length;i++){',
-    '      if(values[i][0] === key) return String(values[i][1]);',
-    '    }',
-    '  }',
-    '  return null;',
-    '}',
-    'function setConfigValue_(controlSheetUrl, key, value){',
-    '  var sh = getControlSheet_(controlSheetUrl, "Config", ["key","value"]);',
-    '  var lastRow = sh.getLastRow();',
-    '  var foundRow = -1;',
-    '  if(lastRow >= 2){',
-    '    var values = sh.getRange(2,1,lastRow-1,2).getValues();',
-    '    for(var i=0;i<values.length;i++){',
-    '      if(values[i][0] === key){ foundRow = i+2; break; }',
-    '    }',
-    '  }',
-    '  if(foundRow > 0){',
-    '    sh.getRange(foundRow,2).setValue(value);',
-    '  } else {',
-    '    var newRow = Math.max(lastRow+1, 2);',
-    '    sh.getRange(newRow,1,1,2).setValues([[key, value]]);',
-    '  }',
-    '}',
-    '',
-    'function getBrandText_(body){',
-    '  try{',
-    '    if(!body.controlSheetUrl) return { ok:false, error:"ບໍ່ພົບ Control Sheet URL" };',
-    '    var v = getConfigValue_(body.controlSheetUrl, "brandText");',
-    '    return { ok:true, brandText: (v === null ? null : v) };',
-    '  }catch(err){',
-    '    return { ok:false, error:"ອ່ານຂໍ້ຄວາມລາຍເຊັນບໍ່ສຳເລັດ: " + String(err && err.message ? err.message : err) };',
-    '  }',
-    '}',
-    'function setBrandText_(body){',
-    '  try{',
-    '    if(!body.controlSheetUrl) return { ok:false, error:"ບໍ່ພົບ Control Sheet URL" };',
-    '    setConfigValue_(body.controlSheetUrl, "brandText", body.brandText || "");',
-    '    return { ok:true };',
-    '  }catch(err){',
-    '    return { ok:false, error:"ບັນທຶກຂໍ້ຄວາມລາຍເຊັນບໍ່ສຳເລັດ: " + String(err && err.message ? err.message : err) };',
     '  }',
     '}'
   ].join('\n');
@@ -2568,7 +2373,7 @@
     initAuthGate();
     initAdminPanel();
     initSheetPanel();
-    if(CONTROL_ENABLED) refreshBrandText();
+    initBillPanel();
     initGuideModal();
     initCopySummary();
     initTableFilters();
