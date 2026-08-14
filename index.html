@@ -393,6 +393,76 @@
   }
   .quick-sheet .sheet-status{margin-top:10px;text-align:center;}
 
+  /* ---- compact combo panel ---- */
+  .quick-sheet.compact-panel{padding:10px 14px;margin-bottom:16px;}
+  .quick-sheet-top.compact{margin-bottom:8px;}
+  .compact-title{font-size:13px !important;}
+  .dest-badge.compact{font-size:10.5px;padding:3px 9px;}
+  .compact-row{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;}
+  .quick-sheet-actions.compact-row .btn.compact{min-width:0;padding:8px 16px;font-size:12.5px;}
+  .sheet-status.compact{font-size:12px;margin-top:8px;}
+  .bill-search-box{display:flex;gap:8px;margin-top:12px;}
+  .bill-search-box input{
+    flex:1;min-width:0;background:var(--panel-alt);border:1px solid var(--line-soft);
+    border-radius:8px;padding:8px 10px;color:var(--cream);font-size:13px;
+  }
+  .bill-search-box input::placeholder{color:var(--cream-dim);}
+  #billSearchResults{margin-top:10px;}
+  .bill-search-row{
+    display:flex;justify-content:space-between;align-items:center;gap:8px;
+    background:var(--panel-alt);border:1px solid var(--line-soft);border-radius:8px;
+    padding:8px 10px;font-size:12.5px;margin-bottom:6px;
+  }
+  .bill-search-row .l{color:var(--cream-dim);}
+  .bill-search-row .l b{color:var(--gold-bright);}
+  .bill-search-row .r{color:var(--cream);white-space:nowrap;}
+
+  /* ---- bill ticket receipt: ໃບນ້ອຍໆ ຊົງຍາວ ຄ້າຍໃບຫວຍ ພ້ອມລາຍນ້ຳໂລໂກ ---- */
+  .bill-ticket{
+    position:relative;
+    max-width:310px;
+    margin:0 auto;
+    background:#fbf7ec;
+    border:2px dashed #c9a227;
+    border-radius:16px;
+    padding:20px 16px 24px;
+    overflow:hidden;
+    color:#2b2b28;
+    box-shadow:0 8px 28px rgba(0,0,0,.4);
+  }
+  .bill-ticket::before{
+    content:'';
+    position:absolute;
+    top:-25%; left:-25%; right:-25%; bottom:-25%;
+    background-image:url('data:image/webp;base64,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');
+    background-repeat:repeat;
+    background-size:100px 100px;
+    opacity:.09;
+    transform:rotate(-18deg);
+    pointer-events:none;
+  }
+  .bill-ticket > *{position:relative;z-index:1;}
+  .bill-brand{text-align:center;color:#8a6d1a;font-weight:700;margin-bottom:8px;letter-spacing:.4px;}
+  .bill-head{border-bottom:1px dashed #cbbf9a;padding-bottom:8px;margin-bottom:10px;}
+  .bill-head-row{display:flex;justify-content:space-between;font-size:11.5px;color:#6b6255;padding:2px 0;}
+  .bill-head-row b{color:#2b2b28;}
+  .bill-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;}
+  .bill-grid-1col{grid-template-columns:1fr;display:flex;flex-direction:column;gap:6px;}
+  .bill-item{
+    display:flex;justify-content:space-between;align-items:center;gap:8px;
+    background:rgba(255,255,255,.55);border:1px solid #e4dcc0;border-radius:6px;
+    padding:6px 10px;font-size:11.5px;
+  }
+  .bill-item-nums{color:#2b2b28;word-break:break-word;flex:1;margin-right:8px;}
+  .bill-item-price{color:#a3721a;white-space:nowrap;font-weight:600;}
+  .bill-total{
+    display:flex;justify-content:space-between;align-items:center;
+    border-top:1.5px dashed #cbbf9a;margin-top:12px;padding-top:12px;
+    font-size:13px;color:#2b2b28;
+  }
+  .bill-total b{color:#a3721a;font-size:17px;}
+  @media (max-width:520px){ .bill-grid{grid-template-columns:1fr;} }
+
   /* ---- syntax guide modal ---- */
   .guide-trigger-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
   #modalOverlay{
@@ -480,6 +550,7 @@
     white-space:pre;
   }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -558,15 +629,25 @@
     <div class="ticket-badge mono" id="ticketClock">—</div>
   </header>
 
-  <div class="quick-sheet" id="quickSheetPanel" style="display:none;">
-    <div class="quick-sheet-top">
-      <h2>⚡ ສົ່ງເຂົ້າ Google Sheet</h2>
-      <div class="dest-badge" id="destBadge">ຈະສົ່ງໄປ Google Sheet ຂອງ: <b id="destUsername">—</b></div>
+  <div class="quick-sheet compact-panel" id="quickSheetPanel" style="display:none;">
+    <div class="quick-sheet-top compact">
+      <h2 class="compact-title">⚡ ສົ່ງຍອດ / ອອກບີນ / ກັອບປີ້</h2>
+      <div class="dest-badge compact" id="destBadge">ຊິດ: <b id="destUsername">—</b></div>
     </div>
-    <div class="quick-sheet-actions">
-      <button class="btn compact" id="sheetSendAllBtn" type="button">ສົ່ງຍອດລວມ</button>
+    <div class="quick-sheet-actions compact-row">
+      <button class="btn compact" id="sheetSendBtn" type="button">📤 ສົ່ງຍອດ</button>
+      <button class="btn compact" id="issueBillBtn" type="button">🧾 ອອກບີນ</button>
+      <button class="btn compact" id="copySummaryBtn2" type="button">📋 ກັອບປີ້</button>
+      <button class="mini-btn" id="saveBillImgBtn" type="button" style="display:none;">💾 ບັນທຶກເປັນຮູບ</button>
+      <button class="mini-btn" id="toggleBillBtn" type="button" style="display:none;">🧾 ເບິ່ງໃບບີນ</button>
     </div>
-    <div class="sheet-status" id="sheetStatus"></div>
+    <div class="sheet-status compact" id="sheetStatus"></div>
+    <div id="billReceiptWrap" style="display:none;margin-top:10px;"></div>
+    <div class="bill-search-box">
+      <input type="text" id="billSearchInput" class="mono" placeholder="🔍 ພິມເລກທີ່ຖືກ ເພື່ອຄົ້ນຫາບີນ (ເຊັ່ນ 22)">
+      <button class="mini-btn gold" id="billSearchBtn" type="button">ຄົ້ນຫາ</button>
+    </div>
+    <div id="billSearchResults"></div>
   </div>
 
   <div class="admin-panel" id="adminPanel">
@@ -595,6 +676,22 @@
             <button class="mini-btn gold" id="changeAdminPwBtn" type="button">ບັນທຶກລະຫັດໃໝ່</button>
           </div>
           <div class="admin-status" id="changeAdminPwStatus"></div>
+        </div>
+      </details>
+      <details>
+        <summary>🏷️ ຂໍ້ຄວາມລາຍເຊັນ / ໂລໂກ (Watermark)</summary>
+        <div style="padding:14px 16px;">
+          <p style="font-size:13px;opacity:.75;margin:0 0 10px;">
+            ຂໍ້ຄວາມນີ້ຈະຖືກໃສ່ຫົວ+ທ້າຍ ໃນຂໍ້ຄວາມ "ໃບສະຫລຸບ" ທີ່ກັອບປີ້ ແລະ ຢູ່ໃນໃບບີນທີ່ອອກ (ຄືລາຍເຊັນ/ໂລໂກ ຂອງທ່ານ)
+          </p>
+          <div class="admin-row">
+            <div class="field">
+              <label for="newBrandText">ຂໍ້ຄວາມ (ຊື່ຮ້ານ, ສະໂລແກນ ຫຼືອື່ນໆ)</label>
+              <input type="text" id="newBrandText" class="mono" placeholder="ເຊັ່ນ: ✦ ຮ້ານ ບຸນຄໍາ ✦">
+            </div>
+            <button class="mini-btn gold" id="saveBrandTextBtn" type="button">ບັນທຶກ</button>
+          </div>
+          <div class="admin-status" id="brandTextStatus"></div>
         </div>
       </details>
       <div class="admin-row">
@@ -702,16 +799,6 @@
         <div class="stub-line banned"><span class="lbl">ຖືກເລກ 2 ໂຕ ລ່າງ</span><span class="val mono" id="win2bAmount">0</span></div>
         <div class="stub-line hero"><span class="lbl">ລວມຈ່າຍລາງວັນ</span><span class="val mono" id="totalWinAmount">0</span></div>
         <button type="button" class="copy-btn" id="copySummaryBtn">📋 ກັອບປີ້ຂໍ້ຄວາມໃບສະຫລຸບ (WhatsApp / Line)</button>
-      </div>
-
-      <div class="stub" style="margin-top:14px;">
-        <div class="stub-title mono">🧾 ອອກບີນ</div>
-        <p style="font-size:13px;opacity:.75;margin:4px 0 12px;">
-          ອອກບີນລະອຽດຄົບທຸກຊຸດເລກ+ລາຄາ ຈາກຍອດທີ່ຄິດໄລ່ລ່າສຸດ ພ້ອມເລກທີ່ບີນປະຈຳວັນ ແລະ ສົ່ງລາຍລະອຽດເຂົ້າ Google Sheet ທັນທີ.
-        </p>
-        <button type="button" class="btn" id="issueBillBtn">🖨 ອອກເລກ 1 ບີນ</button>
-        <div class="admin-status" id="billStatus"></div>
-        <div id="billReceiptWrap" style="margin-top:12px;"></div>
       </div>
 
       <details open>
@@ -823,6 +910,40 @@
     return gsPost({ token: CONFIG.SHARED_TOKEN, action:'setAdminPassword', controlSheetUrl: CONFIG.CONTROL_SHEET_URL, password: pw })
       .then(function(res){
         if(res && res.ok) setAdminPasswordCache(pw);
+        return res;
+      });
+  }
+
+  // ---------- ລາຍເຊັນ/ໂລໂກຂໍ້ຄວາມ (watermark) ----------
+  // ຂໍ້ຄວາມນີ້ຈະຖືກຕໍ່ທ້າຍ/ໃສ່ຫົວ ໃນຂໍ້ຄວາມ "ໃບສະຫລຸບ" ທີ່ກັອບປີ້ ແລະ ໃນໃບບີນທີ່ອອກ —
+  // ຄືກັນກັບລະຫັດ Admin: ຖ້າ CONTROL_ENABLED ຈະຊິ້ງຂ້າມອຸປະກອນ, ຖ້າບໍ່ ຈະເກັບໄວ້ໃນເຄື່ອງນີ້ຢ່າງດຽວ.
+  var BRAND_KEY = 'laoLotteryBrandTextLocal_v1';
+  var DEFAULT_BRAND_TEXT = '✦ ຕູ້ຄິດໄລ່ຫວຍ ✦';
+  function getBrandTextCached(){
+    try{
+      var stored = localStorage.getItem(BRAND_KEY);
+      return (stored !== null && stored !== undefined) ? stored : DEFAULT_BRAND_TEXT;
+    }catch(e){ return DEFAULT_BRAND_TEXT; }
+  }
+  function setBrandTextCache(t){
+    try{ localStorage.setItem(BRAND_KEY, t); return true; }catch(e){ return false; }
+  }
+  function refreshBrandText(){
+    if(!CONTROL_ENABLED) return Promise.resolve(getBrandTextCached());
+    return gsPost({ token: CONFIG.SHARED_TOKEN, action:'getBrandText', controlSheetUrl: CONFIG.CONTROL_SHEET_URL })
+      .then(function(res){
+        if(res && res.ok && typeof res.brandText === 'string'){ setBrandTextCache(res.brandText); return res.brandText; }
+        return getBrandTextCached();
+      })
+      .catch(function(){ return getBrandTextCached(); });
+  }
+  function setBrandText(t){
+    if(!CONTROL_ENABLED){
+      return Promise.resolve(setBrandTextCache(t) ? { ok:true } : { ok:false, error:'ບັນທຶກໃນເຄື່ອງນີ້ບໍ່ໄດ້' });
+    }
+    return gsPost({ token: CONFIG.SHARED_TOKEN, action:'setBrandText', controlSheetUrl: CONFIG.CONTROL_SHEET_URL, brandText: t })
+      .then(function(res){
+        if(res && res.ok) setBrandTextCache(t);
         return res;
       });
   }
@@ -1123,6 +1244,26 @@
       });
     }
 
+    var saveBrandBtn = document.getElementById('saveBrandTextBtn');
+    var brandStatus = document.getElementById('brandTextStatus');
+    var brandInput = document.getElementById('newBrandText');
+    if(brandInput) brandInput.value = getBrandTextCached();
+    if(saveBrandBtn){
+      saveBrandBtn.addEventListener('click', function(){
+        var val = brandInput ? brandInput.value : '';
+        if(brandStatus) brandStatus.textContent = 'ກຳລັງບັນທຶກ...';
+        setBrandText(val).then(function(res){
+          if(res && res.ok){
+            if(brandStatus) brandStatus.textContent = 'ບັນທຶກສຳເລັດ ✓' + (CONTROL_ENABLED ? ' — ໃຊ້ໄດ້ທຸກອຸປະກອນທັນທີ' : ' — ໃຊ້ໄດ້ສະເພາະອຸປະກອນນີ້');
+          } else {
+            if(brandStatus) brandStatus.textContent = 'ບັນທຶກບໍ່ໄດ້: ' + (res && res.error ? res.error : 'ບໍ່ຮູ້ສາເຫດ');
+          }
+        }).catch(function(err){
+          if(brandStatus) brandStatus.textContent = 'ບັນທຶກບໍ່ໄດ້: ' + (err && err.message ? err.message : String(err));
+        });
+      });
+    }
+
     var addUserBtn = document.getElementById('addUserBtn');
     var adminStatus = document.getElementById('adminStatus');
     if(addUserBtn){
@@ -1221,10 +1362,55 @@
     }
   }
 
-  // ---------- send-total panel: only one action now — push the running total
-  // (stake sales, commission split, and computed prize payouts) into the
-  // user's own Google Sheet, combining "dashboard" style stats onto the
-  // same "No1." tab via CONFIG.DASHBOARD_CELLS ----------
+  // ---------- send-total: push the running total (stake sales, commission split, and
+  // computed prize payouts) into the user's own Google Sheet ("No1." dashboard cells) ----------
+  function sendTotalNow(){
+    if(!currentUser || !currentUser.sheetUrl){
+      return Promise.resolve({ ok:false, error:'ຜູ້ໃຊ້ນີ້ຍັງບໍ່ໄດ້ຕັ້ງ Google Sheet — ໄປຕັ້ງຄ່າໃນ ⚙ ຈັດການຜູ້ໃຊ້ (Admin) ກ່ອນ' });
+    }
+    if(!lastTotalAll || lastTotalAll <= 0){
+      return Promise.resolve({ ok:false, error:'ຍັງບໍ່ມີຍອດລວມ — ກົດ "ຄິດໄລ່ຍອດ" ກ່ອນ' });
+    }
+    if(!/\/exec$/.test((CONFIG.WEBAPP_URL||'').trim())){
+      return Promise.resolve({ ok:false, error:'CONFIG.WEBAPP_URL ຢູ່ຫົວໄຟລ໌ index.html ຕ້ອງລົງທ້າຍດ້ວຍ /exec (ບໍ່ແມ່ນ /dev ຫຼືລິ້ງອື່ນ)' });
+    }
+    var pct = parseFloat(document.getElementById('pctInput').value) || 0;
+    return gsPost({
+      action: 'sendTotal',
+      token: CONFIG.SHARED_TOKEN,
+      sheetUrl: currentUser.sheetUrl,
+      sheetTab: CONFIG.SHEET_TAB,
+      startRow: CONFIG.START_ROW,
+      colIndex: CONFIG.COL_INDEX,
+      colNumber: CONFIG.COL_NUMBER,
+      colPrice: CONFIG.COL_PRICE,
+      totalAll: lastTotalAll,
+      dashboard: {
+        totalAll: lastTotalAll,
+        pct: pct,
+        totalReceive: lastTotalAll * (pct/100),
+        totalSend: lastTotalAll - (lastTotalAll * (pct/100)),
+        win2: lastWinResult.win2Amount,
+        win3: lastWinResult.win3Amount,
+        win2Bottom: lastWinResult.win2BottomAmount,
+        totalWin: lastWinResult.total
+      },
+      dashboardCells: CONFIG.DASHBOARD_CELLS
+    }).then(function(res){
+      if(res && res.ok){
+        return { ok:true, note: 'ສົ່ງຍອດລວມ ' + lastTotalAll.toLocaleString() + ' ເຂົ້າຊີດຂອງ ' + currentUser.username + ' ແລ້ວ' };
+      }
+      return { ok:false, error: (res && res.error) ? res.error : 'ບໍ່ຮູ້ສາເຫດ' };
+    }).catch(function(err){
+      var msg = err && err.message ? err.message : String(err);
+      if(/Failed to fetch|NetworkError|Load failed|TypeError/i.test(msg)){
+        msg += ' — ອາດເປັນຍ້ອນບໍ່ມີອິນເຕີເນັດ, URL ໃນ CONFIG.WEBAPP_URL ພິມຜິດ, ຫຼື Apps Script ຍັງບໍ່ໄດ້ Deploy ເປັນ Web App';
+      }
+      return { ok:false, error: msg };
+    });
+  }
+
+  // ---------- ປຸ່ມລວມ: ກົດເທື່ອດຽວ = ສົ່ງຍອດລວມ + ອອກບີນ + ກັອບປີ້ຂໍ້ຄວາມໃບສະຫລຸບ ----------
   function initSheetPanel(){
     var panel = document.getElementById('quickSheetPanel');
     var status = document.getElementById('sheetStatus');
@@ -1233,58 +1419,116 @@
       return;
     }
 
-    var sendAllBtn = document.getElementById('sheetSendAllBtn');
-    if(sendAllBtn){
-      sendAllBtn.addEventListener('click', function(){
-        if(!currentUser || !currentUser.sheetUrl){
-          status.textContent = 'ຜູ້ໃຊ້ນີ້ຍັງບໍ່ໄດ້ຕັ້ງ Google Sheet — ໄປຕັ້ງຄ່າໃນ ⚙ ຈັດການຜູ້ໃຊ້ (Admin) ກ່ອນ';
+    var toggleBtn = document.getElementById('toggleBillBtn');
+    var saveImgBtn = document.getElementById('saveBillImgBtn');
+    var receiptWrap = document.getElementById('billReceiptWrap');
+
+    function showBillControls(){
+      if(toggleBtn){ toggleBtn.style.display = 'inline-block'; toggleBtn.textContent = '🧾 ເບິ່ງໃບບີນ'; }
+      if(saveImgBtn) saveImgBtn.style.display = 'inline-block';
+      if(receiptWrap) receiptWrap.style.display = 'none';
+    }
+
+    if(toggleBtn && receiptWrap){
+      toggleBtn.addEventListener('click', function(){
+        var showing = receiptWrap.style.display !== 'none';
+        receiptWrap.style.display = showing ? 'none' : 'block';
+        toggleBtn.textContent = showing ? '🧾 ເບິ່ງໃບບີນ' : '🧾 ເຊື່ອງໃບບີນ';
+      });
+    }
+
+    if(saveImgBtn){
+      saveImgBtn.addEventListener('click', function(){
+        var ticketEl = receiptWrap ? receiptWrap.querySelector('.bill-ticket') : null;
+        if(!ticketEl){ status.textContent = 'ຍັງບໍ່ມີໃບບີນ — ກົດ "ອອກບີນ" ກ່ອນ'; return; }
+        // ເປີດໃຫ້ເຫັນຊົ່ວຄາວເພື່ອຖ່າຍ (html2canvas ຖ່າຍອົງປະກອບທີ່ display:none ບໍ່ໄດ້)
+        var wasHidden = receiptWrap.style.display === 'none';
+        if(wasHidden) receiptWrap.style.display = 'block';
+        saveImgBtn.disabled = true;
+        status.textContent = 'ກຳລັງສ້າງຮູບໃບບີນ...';
+        if(typeof html2canvas !== 'function'){
+          status.textContent = 'ບໍ່ສາມາດສ້າງຮູບໄດ້ — ຕ້ອງມີອິນເຕີເນັດເພື່ອໂຫລດເຄື່ອງມືສ້າງຮູບ (html2canvas)';
+          saveImgBtn.disabled = false;
+          if(wasHidden) receiptWrap.style.display = 'none';
           return;
         }
-        if(!lastTotalAll || lastTotalAll <= 0){
-          status.textContent = 'ຍັງບໍ່ມີຍອດລວມ — ກົດ "ຄິດໄລ່ຍອດ" ກ່ອນ';
-          return;
-        }
-        if(!/\/exec$/.test(CONFIG.WEBAPP_URL.trim())){
-          status.textContent = 'CONFIG.WEBAPP_URL ຢູ່ຫົວໄຟລ໌ index.html ຕ້ອງລົງທ້າຍດ້ວຍ /exec (ບໍ່ແມ່ນ /dev ຫຼືລິ້ງອື່ນ) — ໄປ Deploy > Manage deployments ເພື່ອກັອບປີ້ URL ທີ່ຖືກຕ້ອງ';
-          return;
-        }
-        status.textContent = 'ກຳລັງສົ່ງຍອດລວມໄປ Google Sheet ຂອງ ' + currentUser.username + '...';
-        gsPost({
-          action: 'sendTotal',
-          token: CONFIG.SHARED_TOKEN,
-          sheetUrl: currentUser.sheetUrl,
-          sheetTab: CONFIG.SHEET_TAB,
-          startRow: CONFIG.START_ROW,
-          colIndex: CONFIG.COL_INDEX,
-          colNumber: CONFIG.COL_NUMBER,
-          colPrice: CONFIG.COL_PRICE,
-          totalAll: lastTotalAll,
-          dashboard: {
-            totalAll: lastTotalAll,
-            pct: parseFloat(document.getElementById('pctInput').value) || 0,
-            totalReceive: lastTotalAll * ((parseFloat(document.getElementById('pctInput').value) || 0) / 100),
-            totalSend: lastTotalAll - (lastTotalAll * ((parseFloat(document.getElementById('pctInput').value) || 0) / 100)),
-            win2: lastWinResult.win2Amount,
-            win3: lastWinResult.win3Amount,
-            win2Bottom: lastWinResult.win2BottomAmount,
-            totalWin: lastWinResult.total
-          },
-          dashboardCells: CONFIG.DASHBOARD_CELLS
-        }).then(function(res){
-          if(res && res.ok){
-            status.textContent = 'ສົ່ງຍອດລວມ ' + lastTotalAll.toLocaleString() + ' ເຂົ້າຊີດຂອງ ' + currentUser.username + ' ແລ້ວ ✓';
-          } else {
-            status.textContent = 'ຜິດພາດ: ' + (res && res.error ? res.error : 'ບໍ່ຮູ້ສາເຫດ');
-          }
+        html2canvas(ticketEl, { backgroundColor: '#0f1a14', scale: 2 }).then(function(canvas){
+          saveImgBtn.disabled = false;
+          if(wasHidden) receiptWrap.style.display = 'none';
+          var link = document.createElement('a');
+          link.download = 'bill-' + billDateStr() + '-' + billTimeStr().replace(/:/g,'') + '.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          status.textContent = '✅ ບັນທຶກຮູບໃບບີນແລ້ວ';
         }).catch(function(err){
-          var msg = err && err.message ? err.message : String(err);
-          if(/Failed to fetch|NetworkError|Load failed|TypeError/i.test(msg)){
-            msg += ' — ອາດເປັນຍ້ອນບໍ່ມີອິນເຕີເນັດ, URL ໃນ CONFIG.WEBAPP_URL ພິມຜິດ, ຫຼື Apps Script ຍັງບໍ່ໄດ້ Deploy ເປັນ Web App';
-          }
-          status.textContent = 'ຜິດພາດ: ' + msg;
+          saveImgBtn.disabled = false;
+          if(wasHidden) receiptWrap.style.display = 'none';
+          status.textContent = 'ສ້າງຮູບບໍ່ສຳເລັດ: ' + (err && err.message ? err.message : String(err));
         });
       });
     }
+
+    var sendBtn = document.getElementById('sheetSendBtn');
+    if(sendBtn){
+      sendBtn.addEventListener('click', function(){
+        if(!lastRows || lastRows.length === 0 || !lastTotalAll || lastTotalAll <= 0){
+          status.textContent = 'ຍັງບໍ່ມີຍອດ — ພິມຊຸດເລກ ແລະ ກົດ "ຄິດໄລ່ຍອດ" ກ່ອນ';
+          return;
+        }
+        sendBtn.disabled = true;
+        status.textContent = 'ກຳລັງສົ່ງຍອດ...';
+        sendTotalNow().then(function(res){
+          sendBtn.disabled = false;
+          status.textContent = res.ok ? ('✅ ' + (res.note || 'ສົ່ງຍອດແລ້ວ')) : ('❌ ' + res.error);
+        });
+      });
+    }
+
+    var billBtn = document.getElementById('issueBillBtn');
+    if(billBtn){
+      billBtn.addEventListener('click', function(){
+        if(!lastRows || lastRows.length === 0 || !lastTotalAll || lastTotalAll <= 0){
+          status.textContent = 'ຍັງບໍ່ມີຍອດ — ພິມຊຸດເລກ ແລະ ກົດ "ຄິດໄລ່ຍອດ" ກ່ອນ';
+          return;
+        }
+        billBtn.disabled = true;
+        status.textContent = 'ກຳລັງອອກບີນ...';
+        issueBillNow().then(function(res){
+          billBtn.disabled = false;
+          status.textContent = res.ok ? ('✅ ອອກບີນ #' + res.billNo + ' ແລ້ວ') : ('❌ ' + res.error);
+          if(res.ok) showBillControls();
+        });
+      });
+    }
+
+    function wireCopyBtn(id){
+      var btn = document.getElementById(id);
+      if(!btn) return;
+      btn.addEventListener('click', function(){
+        copyTextToClipboard(buildSummaryText(), function(ok){
+          status.textContent = ok ? '✅ ກັອບປີ້ຂໍ້ຄວາມໃບສະຫລຸບແລ້ວ — ວາງໄດ້ເລີຍ' : '❌ ກັອບປີ້ບໍ່ໄດ້';
+        });
+      });
+    }
+    wireCopyBtn('copySummaryBtn2');
+
+    var searchBtn = document.getElementById('billSearchBtn');
+    var searchInput = document.getElementById('billSearchInput');
+    var searchResultsWrap = document.getElementById('billSearchResults');
+    function runBillSearch(){
+      var q = searchInput ? searchInput.value.trim() : '';
+      if(!q){ if(searchResultsWrap) searchResultsWrap.innerHTML = '<div class="empty-note">ກະລຸນາພິມເລກທີ່ຈະຄົ້ນຫາ</div>'; return; }
+      if(searchResultsWrap) searchResultsWrap.innerHTML = '<div class="empty-note">ກຳລັງຄົ້ນຫາ...</div>';
+      searchBillsNow(q).then(function(res){
+        if(res && res.ok){
+          renderBillSearchResults(res.matches, q);
+        } else if(searchResultsWrap){
+          searchResultsWrap.innerHTML = '<div class="empty-note">ຄົ້ນຫາບໍ່ໄດ້: ' + escapeHtml(res && res.error ? res.error : 'ບໍ່ຮູ້ສາເຫດ') + '</div>';
+        }
+      });
+    }
+    if(searchBtn) searchBtn.addEventListener('click', runBillSearch);
+    if(searchInput) searchInput.addEventListener('keydown', function(e){ if(e.key === 'Enter') runBillSearch(); });
   }
 
   function KIP(v){
@@ -1298,8 +1542,8 @@
     return '#' + p(d.getDate()) + p(d.getMonth()+1) + d.getFullYear() + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
   }
 
-  // ---------- ອອກບີນ (issue bill): ຮວບຮວມທຸກຊຸດເລກ+ລາຄາຈາກຍອດທີ່ຄິດໄລ່ລ່າສຸດ (lastRows)
-  // ໃຫ້ເປັນລາຍການບີນລະອຽດ (ຄືແຕ່ລະແຖວ raw ທີ່ພິມໄວ້) ພ້ອມລວມລາຄາຂອງແຖວນັ້ນ ----------
+  // ---------- ອອກບີນ (issue bill): ດຶງລາຍລະອຽດ "ດິບ" (ຄືກັນກັບຕາຕະລາງ "ລາຍລະອຽດແຕ່ລະແຖວ")
+  // ຈາກຍອດທີ່ຄິດໄລ່ລ່າສຸດ (lastRows) — ແຕ່ລະເລກເປັນລາຍການແຍກກັນ, ຕັດເລກຫ້າມອອກ. ----------
   function pad2(n){ n = String(n); return n.length < 2 ? '0'+n : n; }
   function billDateStr(d){
     d = d || new Date();
@@ -1314,7 +1558,7 @@
     return pad2(d.getDate()) + '/' + pad2(d.getMonth()+1) + '/' + d.getFullYear();
   }
 
-  function buildBillItems(){
+  function buildBillLineGroups(){
     var order = [];
     var map = {};
     for(var i=0;i<lastRows.length;i++){
@@ -1322,7 +1566,7 @@
       if(r.banned) continue; // ເລກຫ້າມ ບໍ່ນັບເຂົ້າບີນ
       var key = r.lineNo + '|' + r.raw;
       if(!map[key]){
-        map[key] = { raw: r.raw, numbers: [], unitValue: r.unitValue, total: 0 };
+        map[key] = { lineNo: r.lineNo, raw: r.raw, numbers: [], total: 0 };
         order.push(key);
       }
       var g = map[key];
@@ -1343,82 +1587,106 @@
     return n;
   }
 
+  // ໃບບີນແບບຕີ້ຄິດ (ຄ້າຍໃບຫວຍທົ່ວໄປ): ຫົວ ​+ ເລກທີ່ບີນ/ວັນທີ + ຕາຕະລາງ 2 ຄໍ (ຊຸດເລກ | ລາຄາ) + ລວມ + ລາຍເຊັນ
   function renderBillReceipt(bill){
     var wrap = document.getElementById('billReceiptWrap');
     if(!wrap) return;
-    var itemsHtml = bill.items.map(function(it){
-      return '<div class="stub-line"><span class="lbl mono" style="max-width:70%;white-space:normal;">' +
-        escapeHtml(it.numbers.join(' ')) + '</span><span class="val mono">' + KIP(it.total) + '</span></div>';
+    var brand = getBrandTextCached();
+    var cellsHtml = bill.groups.map(function(g){
+      return '<div class="bill-item">' +
+        '<span class="bill-item-nums mono">' + escapeHtml(g.raw) + '</span>' +
+        '<span class="bill-item-price mono">' + KIP(g.total) + '</span>' +
+      '</div>';
     }).join('');
     wrap.innerHTML =
-      '<div class="stub" style="border-color:var(--gold, #d4af37);">' +
-        '<div class="stub-line hero"><span class="lbl">ບີນເລກທີ</span><span class="val mono">' + escapeHtml(String(bill.billNo)) + '/' + escapeHtml(bill.dateLabel) + '</span></div>' +
-        '<div class="stub-line"><span class="lbl">ເວລາອອກບີນ</span><span class="val mono">' + escapeHtml(bill.dateLabel) + ' ' + escapeHtml(bill.timeStr) + '</span></div>' +
-        '<div class="stub-line"><span class="lbl">ຜູ້ອອກບີນ</span><span class="val mono">' + escapeHtml(bill.username) + '</span></div>' +
-        '<hr style="border-color:var(--line-soft);margin:8px 0;">' +
-        itemsHtml +
-        '<div class="stub-line hero"><span class="lbl">ລວມລາຄາທັງໝົດ</span><span class="val mono">' + KIP(bill.totalAll) + '</span></div>' +
+      '<div class="bill-ticket">' +
+        (brand ? '<div class="bill-brand">' + escapeHtml(brand) + '</div>' : '') +
+        '<div class="bill-head">' +
+          '<div class="bill-head-row"><span>ບີນເລກທີ</span><b class="mono">' + escapeHtml(String(bill.billNo)) + ' / ' + escapeHtml(bill.dateLabel) + '</b></div>' +
+          '<div class="bill-head-row"><span>ເວລາ</span><b class="mono">' + escapeHtml(bill.dateLabel) + ' ' + escapeHtml(bill.timeStr) + '</b></div>' +
+          '<div class="bill-head-row"><span>ຜູ້ອອກບີນ</span><b class="mono">' + escapeHtml(bill.username) + '</b></div>' +
+        '</div>' +
+        '<div class="bill-grid bill-grid-1col">' + cellsHtml + '</div>' +
+        '<div class="bill-total"><span>ລວມລາຄາທັງໝົດ</span><b class="mono">' + KIP(bill.totalAll) + ' ກີບ</b></div>' +
+        (brand ? '<div class="bill-brand" style="opacity:.6;font-size:12px;">' + escapeHtml(brand) + '</div>' : '') +
       '</div>';
   }
 
-  function initBillPanel(){
-    var btn = document.getElementById('issueBillBtn');
-    var status = document.getElementById('billStatus');
-    if(!btn) return;
-    btn.addEventListener('click', function(){
-      if(!lastRows || lastRows.length === 0 || !lastTotalAll || lastTotalAll <= 0){
-        if(status) status.textContent = 'ຍັງບໍ່ມີຍອດ — ພິມຊຸດເລກ ແລະ ກົດ "ຄິດໄລ່ຍອດ" ກ່ອນອອກບີນ';
-        return;
-      }
-      var items = buildBillItems();
-      if(items.length === 0){
-        if(status) status.textContent = 'ບໍ່ມີລາຍການທີ່ອອກບີນໄດ້ (ອາດຖືກຕັດອອກໝົດ)';
-        return;
-      }
-      var now = new Date();
-      var dateStr = billDateStr(now);
-      var dateLabel = billDateLabel(now);
-      var timeStr = billTimeStr(now);
-      var username = currentUser ? currentUser.username : 'guest';
+  // ອອກບີນ + ຂຽນເຂົ້າ Google Sheet (ຖ້າຕັ້ງໄວ້) — ຄືນ Promise ທີ່ resolve ດ້ວຍ { ok, billNo, ... }
+  // ບໍ່ວ່າຈະສົ່ງເຂົ້າ Sheet ໄດ້ຫຼືບໍ່ (ອອກບີນທ້ອງຖິ່ນສະເໝີເປັນທາງເລືອກສຳຮອງ) — ໃຫ້ combo action ຂ້າງລຸ່ມນຳໄປໃຊ້ຮ່ວມກັບການສົ່ງຍອດ ແລະ ກັອບປີ້.
+  function issueBillNow(){
+    if(!lastRows || lastRows.length === 0 || !lastTotalAll || lastTotalAll <= 0){
+      return Promise.resolve({ ok:false, error:'ຍັງບໍ່ມີຍອດ — ພິມຊຸດເລກ ແລະ ກົດ "ຄິດໄລ່ຍອດ" ກ່ອນອອກບີນ' });
+    }
+    var groups = buildBillLineGroups();
+    if(groups.length === 0){
+      return Promise.resolve({ ok:false, error:'ບໍ່ມີລາຍການທີ່ອອກບີນໄດ້ (ອາດຖືກຕັດອອກໝົດ)' });
+    }
+    var now = new Date();
+    var dateStr = billDateStr(now);
+    var dateLabel = billDateLabel(now);
+    var timeStr = billTimeStr(now);
+    var username = currentUser ? currentUser.username : 'guest';
+    var canSendToSheet = SHEETS_ENABLED && currentUser && currentUser.sheetUrl && /\/exec$/.test((CONFIG.WEBAPP_URL||'').trim());
 
-      var canSendToSheet = SHEETS_ENABLED && currentUser && currentUser.sheetUrl && /\/exec$/.test((CONFIG.WEBAPP_URL||'').trim());
-
-      if(!canSendToSheet){
-        var billNoLocal = nextLocalBillNo(dateStr);
-        renderBillReceipt({ billNo: billNoLocal, dateLabel: dateLabel, timeStr: timeStr, username: username, items: items, totalAll: lastTotalAll });
-        if(status) status.textContent = currentUser && currentUser.sheetUrl
-          ? 'ອອກບີນ #' + billNoLocal + ' ແລ້ວ (ນັບຢູ່ອຸປະກອນນີ້ — ບໍ່ໄດ້ສົ່ງເຂົ້າ Sheet ຍ້ອນ URL Apps Script ຍັງບໍ່ຖືກຕ້ອງ)'
-          : 'ອອກບີນ #' + billNoLocal + ' ແລ້ວ (ນັບຢູ່ອຸປະກອນນີ້ — ຜູ້ໃຊ້ນີ້ຍັງບໍ່ໄດ້ຕັ້ງ Google Sheet ໃນ Admin, ບໍ່ໄດ້ສົ່ງອອກໄປໃສ)';
-        return;
-      }
-
-      if(status) status.textContent = 'ກຳລັງອອກບີນ ແລະ ສົ່ງເຂົ້າ Google Sheet...';
-      btn.disabled = true;
-      gsPost({
-        action: 'issueBill',
-        token: CONFIG.SHARED_TOKEN,
-        sheetUrl: currentUser.sheetUrl,
-        billTab: 'Bills',
-        dateStr: dateStr,
-        dateLabel: dateLabel,
-        timeStr: timeStr,
-        username: username,
-        totalAll: lastTotalAll,
-        itemsText: items.map(function(it){ return it.raw + '  ⇒  ' + it.numbers.join(' ') + '  =  ' + KIP(it.total); }).join('\n')
-      }).then(function(res){
-        btn.disabled = false;
-        if(res && res.ok){
-          renderBillReceipt({ billNo: res.billNo, dateLabel: dateLabel, timeStr: timeStr, username: username, items: items, totalAll: lastTotalAll });
-          if(status) status.textContent = 'ອອກບີນ #' + res.billNo + ' ແລະ ສົ່ງເຂົ້າ Sheet ຂອງ ' + username + ' ແລ້ວ ✓';
-        } else {
-          if(status) status.textContent = 'ອອກບີນບໍ່ສຳເລັດ: ' + (res && res.error ? res.error : 'ບໍ່ຮູ້ສາເຫດ');
-        }
-      }).catch(function(err){
-        btn.disabled = false;
-        var msg = err && err.message ? err.message : String(err);
-        if(status) status.textContent = 'ອອກບີນບໍ່ສຳເລັດ: ' + msg;
+    if(!canSendToSheet){
+      var billNoLocal = nextLocalBillNo(dateStr);
+      var billLocal = { billNo: billNoLocal, dateLabel: dateLabel, timeStr: timeStr, username: username, groups: groups, totalAll: lastTotalAll };
+      renderBillReceipt(billLocal);
+      return Promise.resolve({
+        ok:true, billNo: billNoLocal, sentToSheet: false,
+        note: currentUser && currentUser.sheetUrl
+          ? 'ອອກບີນ #' + billNoLocal + ' (ນັບຢູ່ອຸປະກອນນີ້ — ບໍ່ໄດ້ສົ່ງເຂົ້າ Sheet ຍ້ອນ URL Apps Script ຍັງບໍ່ຖືກຕ້ອງ)'
+          : 'ອອກບີນ #' + billNoLocal + ' (ນັບຢູ່ອຸປະກອນນີ້ — ຜູ້ໃຊ້ນີ້ຍັງບໍ່ໄດ້ຕັ້ງ Google Sheet, ບໍ່ໄດ້ສົ່ງອອກໄປໃສ)'
       });
+    }
+
+    return gsPost({
+      action: 'issueBill',
+      token: CONFIG.SHARED_TOKEN,
+      sheetUrl: currentUser.sheetUrl,
+      billTab: 'Bills',
+      dateStr: dateStr,
+      timeStr: timeStr,
+      username: username,
+      lineGroups: groups.map(function(g){ return { lineNo: g.lineNo, numbers: g.numbers.join(' '), total: g.total }; })
+    }).then(function(res){
+      if(res && res.ok){
+        var bill = { billNo: res.billNo, dateLabel: dateLabel, timeStr: timeStr, username: username, groups: groups, totalAll: lastTotalAll };
+        renderBillReceipt(bill);
+        return { ok:true, billNo: res.billNo, sentToSheet: true, note: 'ອອກບີນ #' + res.billNo };
+      }
+      return { ok:false, error: (res && res.error) ? res.error : 'ບໍ່ຮູ້ສາເຫດ' };
+    }).catch(function(err){
+      return { ok:false, error: err && err.message ? err.message : String(err) };
     });
+  }
+
+  // ຄົ້ນຫາບີນທີ່ມີເລກນີ້ຢູ່ (ຄົ້ນຫາໃນ Bills tab ຂອງຊີດຜູ້ໃຊ້ປັດຈຸບັນ) — exact token, ບໍ່ແມ່ນ substring
+  function searchBillsNow(query){
+    if(!currentUser || !currentUser.sheetUrl){
+      return Promise.resolve({ ok:false, error:'ຜູ້ໃຊ້ນີ້ຍັງບໍ່ໄດ້ຕັ້ງ Google Sheet — ຄົ້ນຫາໄດ້ສະເພາະຜູ້ໃຊ້ທີ່ມີ Sheet' });
+    }
+    if(!/\/exec$/.test((CONFIG.WEBAPP_URL||'').trim())){
+      return Promise.resolve({ ok:false, error:'CONFIG.WEBAPP_URL ຍັງບໍ່ຖືກຕ້ອງ' });
+    }
+    return gsPost({ action:'searchBills', token: CONFIG.SHARED_TOKEN, sheetUrl: currentUser.sheetUrl, billTab:'Bills', query: query })
+      .catch(function(err){ return { ok:false, error: err && err.message ? err.message : String(err) }; });
+  }
+
+  function renderBillSearchResults(matches, query){
+    var wrap = document.getElementById('billSearchResults');
+    if(!wrap) return;
+    if(!matches || matches.length === 0){
+      wrap.innerHTML = '<div class="empty-note">ບໍ່ພົບບີນທີ່ມີເລກ "' + escapeHtml(query) + '"</div>';
+      return;
+    }
+    wrap.innerHTML = matches.map(function(m){
+      return '<div class="bill-search-row">' +
+        '<span class="l">ບີນ #<b>' + escapeHtml(String(m.billNo)) + '</b> · ' + escapeHtml(m.date) + ' ' + escapeHtml(m.time) + ' · ' + escapeHtml(m.username) + '<br>' + escapeHtml(m.numbers) + '</span>' +
+        '<span class="r mono">' + KIP(m.total) + '</span>' +
+      '</div>';
+    }).join('');
   }
 
   // ---------- parsing helpers ----------
@@ -1983,35 +2251,39 @@
   }
 
   // ---------- receipt-card copy ----------
+  function buildSummaryText(){
+    var winInputs = readWinInputs();
+    var brand = getBrandTextCached();
+    var lines = [];
+    if(brand) lines.push(brand);
+    lines.push('🧾 ໃບສະຫລຸບ ' + nowStamp());
+    lines.push('ລວມຍອດ: ' + document.getElementById('totalAll').textContent);
+    lines.push('ຍອດຕັດອອກ: ' + document.getElementById('totalBanned').textContent);
+    lines.push('%ທີ່ໄດ້: ' + (document.getElementById('pctInput').value || 0) + '%');
+    lines.push('ຍອດຮັບ ( ຄອມມິຊັນ ): ' + document.getElementById('totalReceive').textContent);
+    lines.push('ຍອດສົ່ງ: ' + document.getElementById('totalSend').textContent);
+    lines.push('ຖືກເລກ 2 ໂຕ' + (winInputs.n2 ? ' (' + winInputs.n2 + ')' : '') + ': ' + document.getElementById('win2Amount').textContent);
+    lines.push('ຖືກເລກ 3 ໂຕ' + (winInputs.n3 ? ' (' + winInputs.n3 + ')' : '') + ': ' + document.getElementById('win3Amount').textContent);
+    lines.push('ຖືກເລກ 2 ໂຕ ລ່າງ' + (winInputs.n2b ? ' (' + winInputs.n2b + ')' : '') + ': ' + document.getElementById('win2bAmount').textContent);
+    lines.push('ລວມຈ່າຍລາງວັນ: ' + document.getElementById('totalWinAmount').textContent);
+
+    // ລາຍລະອຽດເລກທີ່ຖືກລາງວັນແຕ່ລະໂຕ (ຖ້າມີ)
+    var detailRows = (lastWinResult.win2Rows || []).map(function(x){ return '  • ' + x.number + ' (2ໂຕ ບົນ) ' + KIP(x.stake) + ' → ' + KIP(x.amount) + ' ກີບ'; })
+      .concat((lastWinResult.win3Rows || []).map(function(x){ return '  • ' + x.number + ' (3ໂຕ) ' + KIP(x.stake) + ' → ' + KIP(x.amount) + ' ກີບ'; }))
+      .concat((lastWinResult.win2BRows || []).map(function(x){ return '  • ' + x.number + ' (2ໂຕ ລ່າງ) ' + KIP(x.stake) + ' → ' + KIP(x.amount) + ' ກີບ'; }));
+    if(detailRows.length > 0){
+      lines.push('—— ລາຍລະອຽດເລກຖືກ ——');
+      lines = lines.concat(detailRows);
+    }
+    if(brand) lines.push(brand);
+    return lines.join('\n');
+  }
+
   function initCopySummary(){
     var btn = document.getElementById('copySummaryBtn');
     if(!btn) return;
     btn.addEventListener('click', function(){
-      var winInputs = readWinInputs();
-      var lines = [
-        '🧾 ໃບສະຫລຸບ ' + nowStamp(),
-        'ລວມຍອດ: ' + document.getElementById('totalAll').textContent,
-        'ຍອດຕັດອອກ: ' + document.getElementById('totalBanned').textContent,
-        '%ທີ່ໄດ້: ' + (document.getElementById('pctInput').value || 0) + '%',
-        'ຍອດຮັບ ( ຄອມມິຊັນ ): ' + document.getElementById('totalReceive').textContent,
-        'ຍອດສົ່ງ: ' + document.getElementById('totalSend').textContent,
-        'ຖືກເລກ 2 ໂຕ' + (winInputs.n2 ? ' (' + winInputs.n2 + ')' : '') + ': ' + document.getElementById('win2Amount').textContent,
-        'ຖືກເລກ 3 ໂຕ' + (winInputs.n3 ? ' (' + winInputs.n3 + ')' : '') + ': ' + document.getElementById('win3Amount').textContent,
-        'ຖືກເລກ 2 ໂຕ ລ່າງ' + (winInputs.n2b ? ' (' + winInputs.n2b + ')' : '') + ': ' + document.getElementById('win2bAmount').textContent,
-        'ລວມຈ່າຍລາງວັນ: ' + document.getElementById('totalWinAmount').textContent
-      ];
-
-      // ລາຍລະອຽດເລກທີ່ຖືກລາງວັນແຕ່ລະໂຕ (ຖ້າມີ)
-      var detailRows = (lastWinResult.win2Rows || []).map(function(x){ return '  • ' + x.number + ' (2ໂຕ ບົນ) ' + KIP(x.stake) + ' → ' + KIP(x.amount) + ' ກີບ'; })
-        .concat((lastWinResult.win3Rows || []).map(function(x){ return '  • ' + x.number + ' (3ໂຕ) ' + KIP(x.stake) + ' → ' + KIP(x.amount) + ' ກີບ'; }))
-        .concat((lastWinResult.win2BRows || []).map(function(x){ return '  • ' + x.number + ' (2ໂຕ ລ່າງ) ' + KIP(x.stake) + ' → ' + KIP(x.amount) + ' ກີບ'; }));
-      if(detailRows.length > 0){
-        lines.push('—— ລາຍລະອຽດເລກຖືກ ——');
-        lines = lines.concat(detailRows);
-      }
-
-      var text = lines.join('\n');
-      copyTextToClipboard(text, function(ok){
+      copyTextToClipboard(buildSummaryText(), function(ok){
         if(ok) flashCopied(btn, '✅ ກັອບປີ້ແລ້ວ — ວາງໄດ້ເລີຍ', '📋 ກັອບປີ້ຂໍ້ຄວາມໃບສະຫລຸບ (WhatsApp / Line)');
         else { btn.textContent = 'ກັອບປີ້ບໍ່ໄດ້ — ລອງໃໝ່'; setTimeout(function(){ btn.textContent = '📋 ກັອບປີ້ຂໍ້ຄວາມໃບສະຫລຸບ (WhatsApp / Line)'; }, 1800); }
       });
@@ -2061,10 +2333,13 @@
     '    if(body.token !== SHARED_TOKEN) return json_({ ok:false, error:"bad token" });',
     '    if(body.action === "sendTotal") return json_(sendTotal_(body));',
     '    if(body.action === "issueBill") return json_(issueBill_(body));',
+    '    if(body.action === "searchBills") return json_(searchBills_(body));',
     '    if(body.action === "getUsers") return json_(getUsers_(body));',
     '    if(body.action === "saveUsers") return json_(saveUsers_(body));',
     '    if(body.action === "getAdminPassword") return json_(getAdminPassword_(body));',
     '    if(body.action === "setAdminPassword") return json_(setAdminPassword_(body));',
+    '    if(body.action === "getBrandText") return json_(getBrandText_(body));',
+    '    if(body.action === "setBrandText") return json_(setBrandText_(body));',
     '    return json_({ ok:false, error:"unknown action" });',
     '  }catch(err){',
     '    // ຄືນ JSON ສະເໝີ — ຖ້າປ່ອຍໃຫ້ exception ຫລຸດອອກໄປ Google ຈະສົ່ງໜ້າ HTML error ກັບຄືນ',
@@ -2137,27 +2412,78 @@
     '    }',
     '    var tabName = body.billTab || "Bills";',
     '    var sh = ss.getSheetByName(tabName);',
+    '    var expectedHeaders = ["ວັນທີ","ເວລາ","ເລກທີ່ບີນ","ຜູ້ໃຊ້","ເລກທີ່ພິມ (ຊຸດ)","ລວມລາຄາແຖວ"];',
     '    if(!sh){',
     '      sh = ss.insertSheet(tabName);',
-    '      sh.getRange(1,1,1,6).setValues([["ວັນທີ","ເວລາ","ເລກທີ່ບີນ","ຜູ້ໃຊ້","ລາຍລະອຽດ","ລວມລາຄາ"]]);',
+    '      sh.getRange(1,1,1,6).setValues([expectedHeaders]);',
+    '    } else {',
+    '      // ຖ້າແທັບ Bills ນີ້ມີຢູ່ແລ້ວຈາກໂຄ້ດເກົ່າ (ຫົວຄໍລຳບໍ່ຄົບ/ບໍ່ກົງ) — ແກ້ໄຂຫົວແຖວໃຫ້ກົງກັບໂຄງສ້າງລ່າສຸດ',
+    '      // ອັດຕະໂນມັດ (ບໍ່ກະທົບແຖວຂໍ້ມູນເກົ່າ).',
+    '      var curHeaders = sh.getRange(1,1,1,6).getValues()[0];',
+    '      var needsUpdate = false;',
+    '      for(var hi=0; hi<6; hi++){ if(curHeaders[hi] !== expectedHeaders[hi]){ needsUpdate = true; break; } }',
+    '      if(needsUpdate) sh.getRange(1,1,1,6).setValues([expectedHeaders]);',
     '    }',
+    '    var lineGroups = body.lineGroups || [];',
+    '    if(lineGroups.length === 0) return { ok:false, error:"ບໍ່ມີລາຍການໃຫ້ອອກບີນ" };',
     '    var lastRow = sh.getLastRow();',
+    '    // ນັບເລກທີ່ບີນ = ຄ່າສູງສຸດຂອງ "ເລກທີ່ບີນ" (ຄໍ C) ໃນວັນດຽວກັນ +1 — ໃຊ້ MAX ບໍ່ແມ່ນນັບແຖວ',
+    '    // ຍ້ອນ 1 ບີນ ອາດມີຫລາຍແຖວ (ແຖວລະ 1 ຊຸດເລກທີ່ພິມ).',
     '    var billNo = 1;',
     '    if(lastRow >= 2){',
-    '      var dateCol = sh.getRange(2,1,lastRow-1,1).getValues();',
-    '      var count = 0;',
-    '      for(var i=0;i<dateCol.length;i++){',
-    '        if(String(dateCol[i][0]) === String(body.dateStr)) count++;',
+    '      var scanRows = sh.getRange(2,1,lastRow-1,3).getValues(); // A=ວັນທີ, C=ເລກທີ່ບີນ',
+    '      var maxNo = 0;',
+    '      for(var i=0;i<scanRows.length;i++){',
+    '        if(String(scanRows[i][0]) === String(body.dateStr)){',
+    '          var n = Number(scanRows[i][2]) || 0;',
+    '          if(n > maxNo) maxNo = n;',
+    '        }',
     '      }',
-    '      billNo = count + 1;',
+    '      billNo = maxNo + 1;',
     '    }',
-    '    var newRow = lastRow + 1;',
-    '    sh.getRange(newRow,1,1,6).setValues([[',
-    '      body.dateStr || "", body.timeStr || "", billNo, body.username || "", body.itemsText || "", body.totalAll || 0',
-    '    ]]);',
-    '    return { ok:true, billNo: billNo, row: newRow };',
+    '    var outRows = lineGroups.map(function(g){',
+    '      return [',
+    '        body.dateStr || "", body.timeStr || "", billNo, body.username || "",',
+    '        g.numbers || "", g.total || 0',
+    '      ];',
+    '    });',
+    '    sh.getRange(lastRow+1, 1, outRows.length, 6).setValues(outRows);',
+    '    return { ok:true, billNo: billNo, rowsWritten: outRows.length };',
     '  }catch(err){',
     '    return { ok:false, error:"ອອກບີນບໍ່ສຳເລັດ: " + String(err && err.message ? err.message : err) };',
+    '  }',
+    '}',
+    '',
+    '// ຄົ້ນຫາເລກຢູ່ໃນແທັບ Bills ຂອງຊີດຜູ້ໃຊ້ນັ້ນ — ກວດຄໍລຳ "ເລກທີ່ພິມ (ຊຸດ)" ແບບກົງເປັກ (exact token)',
+    '// ບໍ່ແມ່ນ substring, ເພື່ອບໍ່ໃຫ້ຄົ້ນ "5" ແລ້ວໄປພົບ "54"/"350" ແບບຜິດໆ.',
+    'function searchBills_(body){',
+    '  try{',
+    '    if(!body.sheetUrl) return { ok:false, error:"ບໍ່ພົບ Google Sheet URL" };',
+    '    var query = String(body.query || "").trim();',
+    '    if(!query) return { ok:false, error:"ບໍ່ມີເລກທີ່ຄົ້ນຫາ" };',
+    '    var sheetId = extractSheetId_(body.sheetUrl);',
+    '    if(!sheetId) return { ok:false, error:"ອ່ານ Google Sheet ID ຈາກ URL ບໍ່ໄດ້: " + body.sheetUrl };',
+    '    var ss = SpreadsheetApp.openById(sheetId);',
+    '    var sh = ss.getSheetByName(body.billTab || "Bills");',
+    '    if(!sh) return { ok:true, matches: [] };',
+    '    var lastRow = sh.getLastRow();',
+    '    if(lastRow < 2) return { ok:true, matches: [] };',
+    '    var data = sh.getRange(2,1,lastRow-1,6).getValues();',
+    '    var matches = [];',
+    '    for(var i=0;i<data.length;i++){',
+    '      var numbersCell = String(data[i][4] || "");',
+    '      var tokens = numbersCell.split(/\\s+/).filter(function(t){ return t.length > 0; });',
+    '      if(tokens.indexOf(query) !== -1){',
+    '        matches.push({',
+    '          date: String(data[i][0]||""), time: String(data[i][1]||""), billNo: data[i][2],',
+    '          username: String(data[i][3]||""), numbers: numbersCell, total: data[i][5]||0',
+    '        });',
+    '        if(matches.length >= 200) break;',
+    '      }',
+    '    }',
+    '    return { ok:true, matches: matches };',
+    '  }catch(err){',
+    '    return { ok:false, error:"ຄົ້ນຫາບໍ່ສຳເລັດ: " + String(err && err.message ? err.message : err) };',
     '  }',
     '}',
     '',
@@ -2252,6 +2578,55 @@
     '    return { ok:true };',
     '  }catch(err){',
     '    return { ok:false, error:"ບັນທຶກລະຫັດ Admin ບໍ່ສຳເລັດ: " + String(err && err.message ? err.message : err) };',
+    '  }',
+    '}',
+    '',
+    '// ອ່ານ/ບັນທຶກຄ່າ key/value ໃນແທັບ Config ແບບທົ່ວໄປ (ໃຊ້ຮ່ວມກັນລະຫວ່າງ adminPassword ແລະ brandText)',
+    'function getConfigValue_(controlSheetUrl, key){',
+    '  var sh = getControlSheet_(controlSheetUrl, "Config", ["key","value"]);',
+    '  var lastRow = sh.getLastRow();',
+    '  if(lastRow >= 2){',
+    '    var values = sh.getRange(2,1,lastRow-1,2).getValues();',
+    '    for(var i=0;i<values.length;i++){',
+    '      if(values[i][0] === key) return String(values[i][1]);',
+    '    }',
+    '  }',
+    '  return null;',
+    '}',
+    'function setConfigValue_(controlSheetUrl, key, value){',
+    '  var sh = getControlSheet_(controlSheetUrl, "Config", ["key","value"]);',
+    '  var lastRow = sh.getLastRow();',
+    '  var foundRow = -1;',
+    '  if(lastRow >= 2){',
+    '    var values = sh.getRange(2,1,lastRow-1,2).getValues();',
+    '    for(var i=0;i<values.length;i++){',
+    '      if(values[i][0] === key){ foundRow = i+2; break; }',
+    '    }',
+    '  }',
+    '  if(foundRow > 0){',
+    '    sh.getRange(foundRow,2).setValue(value);',
+    '  } else {',
+    '    var newRow = Math.max(lastRow+1, 2);',
+    '    sh.getRange(newRow,1,1,2).setValues([[key, value]]);',
+    '  }',
+    '}',
+    '',
+    'function getBrandText_(body){',
+    '  try{',
+    '    if(!body.controlSheetUrl) return { ok:false, error:"ບໍ່ພົບ Control Sheet URL" };',
+    '    var v = getConfigValue_(body.controlSheetUrl, "brandText");',
+    '    return { ok:true, brandText: (v === null ? null : v) };',
+    '  }catch(err){',
+    '    return { ok:false, error:"ອ່ານຂໍ້ຄວາມລາຍເຊັນບໍ່ສຳເລັດ: " + String(err && err.message ? err.message : err) };',
+    '  }',
+    '}',
+    'function setBrandText_(body){',
+    '  try{',
+    '    if(!body.controlSheetUrl) return { ok:false, error:"ບໍ່ພົບ Control Sheet URL" };',
+    '    setConfigValue_(body.controlSheetUrl, "brandText", body.brandText || "");',
+    '    return { ok:true };',
+    '  }catch(err){',
+    '    return { ok:false, error:"ບັນທຶກຂໍ້ຄວາມລາຍເຊັນບໍ່ສຳເລັດ: " + String(err && err.message ? err.message : err) };',
     '  }',
     '}'
   ].join('\n');
@@ -2373,7 +2748,7 @@
     initAuthGate();
     initAdminPanel();
     initSheetPanel();
-    initBillPanel();
+    if(CONTROL_ENABLED) refreshBrandText();
     initGuideModal();
     initCopySummary();
     initTableFilters();
