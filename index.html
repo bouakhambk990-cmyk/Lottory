@@ -463,13 +463,24 @@
   .bill-search-box input::placeholder{color:var(--cream-dim);}
   #billSearchResults{margin-top:10px;}
   .bill-search-row{
-    display:flex;justify-content:space-between;align-items:center;gap:8px;
     background:var(--panel-alt);border:1px solid var(--line-soft);border-radius:8px;
-    padding:8px 10px;font-size:12.5px;margin-bottom:6px;
+    padding:10px 12px;font-size:12.5px;margin-bottom:8px;
   }
-  .bill-search-row .l{color:var(--cream-dim);}
+  .bill-search-row.hit{border-color:var(--gold);}
+  .bill-search-row .l{color:var(--cream-dim);margin-top:6px;}
   .bill-search-row .l b{color:var(--gold-bright);}
-  .bill-search-row .r{color:var(--cream);white-space:nowrap;}
+  .bill-search-row .r{color:var(--cream-dim);white-space:nowrap;margin-top:6px;font-size:11.5px;}
+  .hit-amount{
+    display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+    background:rgba(224,100,74,.12);border:1px solid var(--red-bright);border-radius:6px;
+    padding:6px 10px;font-size:13px;color:var(--cream);
+  }
+  .hit-amount .hit-stake{color:var(--red-bright);font-size:15px;}
+  .hit-amount .hit-win{color:var(--gold-bright);font-size:15px;}
+  mark.hit-number{
+    background:var(--red-bright);color:#fff;font-weight:700;
+    padding:1px 5px;border-radius:4px;font-family:"JetBrains Mono","IBM Plex Mono",monospace;
+  }
 
   /* ---- bill ticket receipt: ໃບນ້ອຍໆ ຊົງຍາວ ຄ້າຍໃບຫວຍ ພ້ອມລາຍນ້ຳໂລໂກ ---- */
   .bill-ticket{
@@ -922,7 +933,7 @@
 
     <div class="board-input-row">
       <textarea id="boardInput" class="mono" rows="4" placeholder="ພິມ ຫຼື ອ່ານຈາກຮູບ: 12,52,92=20&#10;123 456=50"></textarea>
-      <input type="file" id="boardOcrFile" accept="image/*" capture="environment" style="display:none;">
+      <input type="file" id="boardOcrFile" accept="image/*" style="display:none;">
     </div>
     <div class="board-btn-row">
       <button type="button" class="mini-btn" id="boardOcrBtn">📷 ອ່ານຮູບປີ້ (OCR)</button>
@@ -1891,10 +1902,29 @@
       wrap.innerHTML = '<div class="empty-note">ບໍ່ພົບບີນທີ່ມີເລກ "' + escapeHtml(query) + '"</div>';
       return;
     }
+    var winInputs = readWinInputs();
+    var len = query.length;
+    var rate = (len === 3) ? winInputs.r3 : winInputs.r2; // ຖ້າ 2 ໂຕ ໃຊ້ອັດຕາ "ບົນ" ເປັນຄ່າປະມານ (ຂໍ້ມູນບີນບໍ່ໄດ້ແຍກບົນ/ລ່າງ)
     wrap.innerHTML = matches.map(function(m){
-      return '<div class="bill-search-row">' +
-        '<span class="l">ບີນ #<b>' + escapeHtml(String(m.billNo)) + '</b> · ' + escapeHtml(m.date) + ' ' + escapeHtml(m.time) + ' · ' + escapeHtml(m.username) + '<br>' + escapeHtml(m.numbers) + '</span>' +
-        '<span class="r mono">' + KIP(m.total) + '</span>' +
+      var tokens = String(m.numbers || '').split(/\s+/).filter(function(t){ return t; });
+      var stake = 0;
+      var highlightedNums = tokens.map(function(tok){
+        var parts = tok.split('=');
+        var num = parts[0];
+        if(num === query){
+          stake = parseFloat(parts[1]) || 0;
+          return '<mark class="hit-number">' + escapeHtml(tok) + '</mark>';
+        }
+        return escapeHtml(tok);
+      }).join(' ');
+      var winAmt = rate > 0 ? stake * rate : null;
+      var hitLine = '<div class="hit-amount">🎯 ຖືກເລກ <b>' + escapeHtml(query) + '</b> — ຍອດຖືກ <b class="hit-stake">' + KIP(stake) + ' ກີບ</b>' +
+        (winAmt !== null ? ' → ຄາດຄະເນຈ່າຍ <b class="hit-win">' + KIP(winAmt) + ' ກີບ</b> (×' + rate + ')' : '') +
+        '</div>';
+      return '<div class="bill-search-row hit">' +
+        hitLine +
+        '<div class="l">ບີນ #<b>' + escapeHtml(String(m.billNo)) + '</b> · ' + escapeHtml(m.date) + ' ' + escapeHtml(m.time) + ' · ' + escapeHtml(m.username) + '<br>' + highlightedNums + '</div>' +
+        '<div class="r mono">ລວມທັງບີນ: ' + KIP(m.total) + '</div>' +
       '</div>';
     }).join('');
   }
@@ -2921,6 +2951,101 @@
     return s;
   }
 
+  // ປັບປຸງຄຸນນະພາບຮູບກ່ອນສົ່ງໃຫ້ OCR ອ່ານ — ຂະຫຍາຍໃຫ້ໃຫຍ່ຂຶ້ນ (ຕົວໜັງສືນ້ອຍອ່ານຍາກ),
+  // ປ່ຽນເປັນຂາວດຳ ແລະ ເພີ່ມຄວາມຄົມຊັດ (contrast) — ຊ່ວຍໃຫ້ອ່ານຕົວເລກຖືກຕ້ອງຂຶ້ນຫລາຍ
+  // ໂດຍສະເພາະຮູບຖ່າຍຈາກມືຖືທີ່ແສງບໍ່ພຽງພໍ ຫຼື ໂຟກັດບໍ່ຄົມ.
+  // ຄິດໄລ່ຄ່າ threshold ທີ່ດີທີ່ສຸດແບບອັດຕະໂນມັດ (Otsu's method) ເພື่ອແປງຮູບເປັນຂາວ-ດຳລ້ວນ —
+  // ວິທີນີ້ຊ່ວຍໃຫ້ OCR ອ່ານໂຕໜັງສືຖືກຕ້ອງກວ່າການເພີ່ມ contrast ທຳມະດາຫລາຍ ໂດຍສະເພາະຮູບຖ່າຍ
+  // ທີ່ແສງບໍ່ສະໝ່ຳສະເໝີ (ເງົາ, ແສງແດດ, ແສງໄຟ).
+  function computeOtsuThreshold(hist, total){
+    var sum = 0;
+    for(var t=0;t<256;t++) sum += t * hist[t];
+    var sumB = 0, wB = 0, wF = 0, varMax = 0, threshold = 128;
+    for(var t2=0;t2<256;t2++){
+      wB += hist[t2];
+      if(wB === 0) continue;
+      wF = total - wB;
+      if(wF === 0) break;
+      sumB += t2 * hist[t2];
+      var mB = sumB / wB;
+      var mF = (sum - sumB) / wF;
+      var varBetween = wB * wF * (mB - mF) * (mB - mF);
+      if(varBetween > varMax){ varMax = varBetween; threshold = t2; }
+    }
+    return threshold;
+  }
+
+  function preprocessImageForOcr(file){
+    return new Promise(function(resolve, reject){
+      var img = new Image();
+      var url = URL.createObjectURL(file);
+      img.onload = function(){
+        URL.revokeObjectURL(url);
+        var longSide = Math.max(img.width, img.height);
+        var scale = longSide > 0 ? Math.min(2600 / longSide, 3.5) : 1;
+        if(scale < 1) scale = 1;
+        var canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        var ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        try{
+          var w = canvas.width, h = canvas.height;
+          var imgData = ctx.getImageData(0, 0, w, h);
+          var d = imgData.data;
+          var n = w * h;
+          var gray = new Float32Array(n);
+          for(var i=0, p=0; i<d.length; i+=4, p++){
+            gray[p] = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
+          }
+          // ຄວາມຄົມ (mild unsharp mask): ເນັ້ນຂອບໂຕໜັງສືໃຫ້ຄົມຂຶ້ນກ່ອນ binarize
+          var sharp = new Float32Array(n);
+          for(var y=0;y<h;y++){
+            for(var x=0;x<w;x++){
+              var idx = y*w + x;
+              if(x===0||y===0||x===w-1||y===h-1){ sharp[idx] = gray[idx]; continue; }
+              var center = gray[idx];
+              var neighborAvg = (gray[idx-1]+gray[idx+1]+gray[idx-w]+gray[idx+w]) / 4;
+              var v = center + (center - neighborAvg) * 0.6;
+              if(v < 0) v = 0; else if(v > 255) v = 255;
+              sharp[idx] = v;
+            }
+          }
+          // Otsu threshold ຈາກ histogram ຂອງຮູບທີ່ຄົມແລ້ວ
+          var hist = new Array(256).fill(0);
+          for(var p2=0;p2<n;p2++) hist[Math.round(sharp[p2])]++;
+          var threshold = computeOtsuThreshold(hist, n);
+          for(var i2=0, p3=0; i2<d.length; i2+=4, p3++){
+            var val = sharp[p3] >= threshold ? 255 : 0;
+            d[i2] = d[i2+1] = d[i2+2] = val;
+          }
+          ctx.putImageData(imgData, 0, 0);
+        }catch(e){ /* ຖ້າແກ້ pixel ບໍ່ໄດ້ (ບາງ browser ຈຳກັດ) ໃຊ້ຮູບຂະຫຍາຍທຳມະດາແທນ */ }
+        canvas.toBlob(function(blob){
+          if(blob) resolve(blob); else resolve(file);
+        }, 'image/png');
+      };
+      img.onerror = function(){ URL.revokeObjectURL(url); resolve(file); };
+      img.src = url;
+    });
+  }
+
+  // ຈັດຂໍ້ຄວາມທີ່ອ່ານໄດ້ໃຫ້ລຽງກັນສວຍງາມ: ຕັດຊ່ອງຫວ່າງເກີນ, ລຶບແຖວຫວ່າງ/ແຖວທີ່ບໍ່ມີໂຕເລກເລີຍ
+  // (ມັກເປັນສິ່ງແປກປົນ/ລາຍນ້ຳທີ່ອ່ານຜິດ), ໂດຍບໍ່ໄປແກ້ໂຕເລກເອງ (ເພື່ອບໍ່ໃຫ້ສ່ຽງແກ້ຜິດ) — ຜູ້ໃຊ້ຍັງຄວນກວດຄືນ.
+  function cleanOcrText(raw){
+    var lines = String(raw || '').split(/\r?\n/);
+    var cleaned = [];
+    for(var i=0;i<lines.length;i++){
+      var t = lines[i].replace(/[ \t]+/g, ' ').trim();
+      if(!t) continue;
+      if(!/\d/.test(t)) continue; // ຕັດແຖວທີ່ບໍ່ມີໂຕເລກເລີຍ (ມັກເປັນສິ່ງແປກປົນ)
+      cleaned.push(t);
+    }
+    return cleaned.join('\n');
+  }
+
   // ຄິດໄລ່ຂໍ້ຄວາມທີ່ພິມ ດ້ວຍຕົວອ່ານອັນດຽວກັບໜ້າຫລັກ (parseAll) — ໃຊ້ bannedInput ຂອງໜ້າຫລັກຮ່ວມກັນ
   function aggregateBoardText(text){
     var bannedInput = document.getElementById('bannedInput');
@@ -3224,20 +3349,25 @@
           e.target.value = '';
           return;
         }
-        if(statusEl) statusEl.textContent = 'ກຳລັງອ່ານຮູບ... (ອາດໃຊ້ເວລາ 10-30 ວິນາທີ)';
-        Tesseract.recognize(file, 'eng')
-          .then(function(result){
-            var text = (result && result.data && result.data.text) ? result.data.text : '';
-            var textEl = document.getElementById('boardInput');
-            if(textEl) textEl.value = (textEl.value ? textEl.value + '\n' : '') + text.trim();
-            if(statusEl) statusEl.textContent = '✅ ອ່ານຮູບແລ້ວ — ກະລຸນາກວດ ແລະ ແກ້ໄຂຂໍ້ຄວາມໃຫ້ຖືກຕ້ອງກ່ອນກົດ "ເພີ່ມເຂົ້າຕາຕະລາງ"';
-          })
-          .catch(function(err){
-            if(statusEl) statusEl.textContent = 'ອ່ານຮູບບໍ່ສຳເລັດ: ' + (err && err.message ? err.message : String(err));
-          })
-          .finally(function(){
-            e.target.value = '';
-          });
+        if(statusEl) statusEl.textContent = 'ກຳລັງປັບປຸງຄຸນນະພາບຮູບ...';
+        preprocessImageForOcr(file).then(function(processedImg){
+          if(statusEl) statusEl.textContent = 'ກຳລັງອ່ານຂໍ້ຄວາມ... (ອາດໃຊ້ເວລາ 10-40 ວິນາທີ)';
+          return Tesseract.recognize(processedImg, 'eng+lao');
+        }).then(function(result){
+          var rawText = (result && result.data && result.data.text) ? result.data.text : '';
+          var text = cleanOcrText(rawText);
+          var textEl = document.getElementById('boardInput');
+          if(textEl) textEl.value = (textEl.value.trim() ? textEl.value.trim() + '\n' : '') + text;
+          if(statusEl){
+            statusEl.textContent = text
+              ? '✅ ອ່ານຮູບແລ້ວ — ກະລຸນາກວດ ແລະ ແກ້ໄຂຂໍ້ຄວາມໃຫ້ຖືກຕ້ອງກ່ອນກົດ "ເພີ່ມເຂົ້າຕາຕະລາງ"'
+              : '⚠ ອ່ານຮູບແລ້ວແຕ່ບໍ່ພົບໂຕເລກ — ລອງຖ່າຍໃໝ່ໃຫ້ຄົມຊັດ ຫຼືພິມເອງ';
+          }
+        }).catch(function(err){
+          if(statusEl) statusEl.textContent = 'ອ່ານຮູບບໍ່ສຳເລັດ: ' + (err && err.message ? err.message : String(err));
+        }).finally(function(){
+          e.target.value = '';
+        });
       });
     }
   }
