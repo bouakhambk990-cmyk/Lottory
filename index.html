@@ -879,22 +879,31 @@
         <button type="button" class="board-tab" data-view="board">🎯 ຕາຕະລາງເລກ + ຈຳກັດວົງເງິນ</button>
       </div>
 
-      <div id="tabPanelBetting">
-      <div class="label-row">
-        <h2 style="margin:0;">ຂໍ້ມູນລາຍການແທງ</h2>
-        <button type="button" class="mini-btn" id="betPanelToggle">ເຊື່ອງ</button>
-      </div>
-      <div id="betPanelBody">
+      <!-- ຊ່ອງພິມເລກ+ລາຄາ ໃຊ້ຮ່ວມກັນທັງ "ຂໍ້ມູນລາຍການແທງ" ແລະ "ຕາຕະລາງເລກ" — ພິມ/ວາງ/ອ່ານຮູບຄັ້ງດຽວ
+           ໃຊ້ໄດ້ທັງ 2 ໂໝດ ບໍ່ຕ້ອງກັອບປີ້ໄປວາງຊ້ຳ -->
       <div class="guide-trigger-row">
         <button type="button" class="mini-btn gold" id="guideOpenBtn">📖 ຄຳແນະນຳ / Syntax</button>
         <span style="font-size:11.5px;color:var(--cream-dim);align-self:center;">ຄັ່ນເລກ <code style="background:var(--panel-alt);border:1px solid var(--line-soft);padding:1px 5px;border-radius:3px;color:var(--gold-bright);">, . - ; /</code> · ຄັ່ນລາຄາ <code style="background:var(--panel-alt);border:1px solid var(--line-soft);padding:1px 5px;border-radius:3px;color:var(--gold-bright);">: =</code></span>
       </div>
 
       <div class="label-row">
-        <label class="field-label" for="betInput" style="margin:0;">ລາຍການເລກ + ລາຄາ</label>
+        <label class="field-label" for="betInput" style="margin:0;">ລາຍການເລກ + ລາຄາ (ໃຊ້ຮ່ວມກັນທັງ 2 ໂໝດຂ້າງລຸ່ມ)</label>
         <button type="button" class="mini-btn" id="clearBtn">ລ້າງຂໍ້ມູນ</button>
       </div>
       <textarea id="betInput" class="mono" spellcheck="false"></textarea>
+      <div class="board-btn-row" style="margin-top:8px;">
+        <button type="button" class="mini-btn" id="boardOcrBtn">📷 ອ່ານຮູບປີ້ (OCR)</button>
+        <button type="button" class="mini-btn" id="boardSampleBtn">🧪 ຕົວຢ່າງ</button>
+        <input type="file" id="boardOcrFile" accept="image/*" style="display:none;">
+      </div>
+      <div class="admin-status" id="sharedInputStatus"></div>
+
+      <div id="tabPanelBetting">
+      <div class="label-row">
+        <h2 style="margin:0;">ຂໍ້ມູນລາຍການແທງ</h2>
+        <button type="button" class="mini-btn" id="betPanelToggle">ເຊື່ອງ</button>
+      </div>
+      <div id="betPanelBody">
 
       <label class="field-label" for="bannedInput">ເລກທີ່ຕ້ອງຫ້າມ (ຄັ່ນດ້ວຍ , . - ; / ຫຼືວັກ)</label>
       <input type="text" id="bannedInput" class="mono" placeholder="ຕົວຢ່າງ: 89, 47, 578">
@@ -929,16 +938,9 @@
       </div>
 
       <div id="tabPanelBoard" style="display:none;">
-    <p class="board-sub">ຕິດຕາມຍອດເງິນສະສົມແຕ່ລະເລກ ຂ້າມຫລາຍໆບີນ, ຕັ້ງເພດານເຕືອນ, ສົ່ງອອກ/ຕັດເລກໄດ້ — ໃຊ້ຕົວອ່ານເລກ+ລາຄາອັນດຽວກັບຕູ້ຄິດໄລ່ຫລັກ</p>
+    <p class="board-sub">ຕິດຕາມຍອດເງິນສະສົມແຕ່ລະເລກ ຂ້າມຫລາຍໆບີນ, ຕັ້ງເພດານເຕືອນ, ສົ່ງອອກ/ຕັດເລກໄດ້ — ໃຊ້ຂໍ້ມູນຈາກຊ່ອງ "ລາຍການເລກ + ລາຄາ" ຢູ່ເທິງນີ້ຮ່ວມກັນ</p>
 
-    <div class="board-input-row">
-      <textarea id="boardInput" class="mono" rows="4" placeholder="ພິມ ຫຼື ອ່ານຈາກຮູບ: 12,52,92=20&#10;123 456=50"></textarea>
-      <input type="file" id="boardOcrFile" accept="image/*" style="display:none;">
-    </div>
     <div class="board-btn-row">
-      <button type="button" class="mini-btn" id="boardOcrBtn">📷 ອ່ານຮູບປີ້ (OCR)</button>
-      <button type="button" class="mini-btn" id="boardSampleBtn">🧪 ທົດສອບ</button>
-      <button type="button" class="mini-btn" id="boardClearBtn">🧹 ລ້າງຊ່ອງ</button>
       <select id="boardCurrencySelect" class="mono board-currency-select">
         <option value="lak">ກີບ (LAK)</option>
         <option value="thb">ບາດ (THB)</option>
@@ -3290,10 +3292,10 @@
     var addBtn = document.getElementById('boardAddBtn');
     if(addBtn){
       addBtn.addEventListener('click', function(){
-        var textEl = document.getElementById('boardInput');
+        var textEl = document.getElementById('betInput');
         var statusEl = document.getElementById('boardInputStatus');
         var text = textEl ? textEl.value : '';
-        if(!text || !text.trim()){ if(statusEl) statusEl.textContent = 'ຍັງບໍ່ໄດ້ພິມຫຍັງ'; return; }
+        if(!text || !text.trim()){ if(statusEl) statusEl.textContent = 'ຍັງບໍ່ໄດ້ພິມຫຍັງ — ພິມຢູ່ຊ່ອງ "ລາຍການເລກ + ລາຄາ" ຢູ່ເທິງນີ້'; return; }
         var currencySelect = document.getElementById('boardCurrencySelect');
         var currency = currencySelect ? currencySelect.value : 'lak';
         var res = aggregateBoardText(text);
@@ -3311,17 +3313,10 @@
     var sampleBtn = document.getElementById('boardSampleBtn');
     if(sampleBtn){
       sampleBtn.addEventListener('click', function(){
-        var textEl = document.getElementById('boardInput');
-        if(textEl) textEl.value = '12,52,92=20\n123,456=50\n07,47,87=15';
-      });
-    }
-    var clearBtn = document.getElementById('boardClearBtn');
-    if(clearBtn){
-      clearBtn.addEventListener('click', function(){
-        var textEl = document.getElementById('boardInput');
-        if(textEl) textEl.value = '';
-        var statusEl = document.getElementById('boardInputStatus');
-        if(statusEl) statusEl.textContent = '';
+        var textEl = document.getElementById('betInput');
+        if(textEl) textEl.value = (textEl.value.trim() ? textEl.value.trim() + '\n' : '') + '12,52,92=20\n123,456=50\n07,47,87=15';
+        var statusEl = document.getElementById('sharedInputStatus');
+        if(statusEl) statusEl.textContent = '✅ ເພີ່ມຂໍ້ມູນຕົວຢ່າງໃສ່ຊ່ອງແລ້ວ';
       });
     }
     var resetBtn = document.getElementById('boardResetBtn');
@@ -3342,7 +3337,7 @@
       ocrBtn.addEventListener('click', function(){ ocrFile.click(); });
       ocrFile.addEventListener('change', function(e){
         var file = e.target.files && e.target.files[0];
-        var statusEl = document.getElementById('boardInputStatus');
+        var statusEl = document.getElementById('sharedInputStatus');
         if(!file) return;
         if(typeof Tesseract === 'undefined'){
           if(statusEl) statusEl.textContent = 'ບໍ່ສາມາດອ່ານຮູບໄດ້ — ຕ້ອງມີອິນເຕີເນັດເພື່ອໂຫລດເຄື່ອງມືອ່ານຮູບ (Tesseract.js) ຄັ້ງທຳອິດ';
@@ -3356,11 +3351,11 @@
         }).then(function(result){
           var rawText = (result && result.data && result.data.text) ? result.data.text : '';
           var text = cleanOcrText(rawText);
-          var textEl = document.getElementById('boardInput');
+          var textEl = document.getElementById('betInput');
           if(textEl) textEl.value = (textEl.value.trim() ? textEl.value.trim() + '\n' : '') + text;
           if(statusEl){
             statusEl.textContent = text
-              ? '✅ ອ່ານຮູບແລ້ວ — ກະລຸນາກວດ ແລະ ແກ້ໄຂຂໍ້ຄວາມໃຫ້ຖືກຕ້ອງກ່ອນກົດ "ເພີ່ມເຂົ້າຕາຕະລາງ"'
+              ? '✅ ອ່ານຮູບແລ້ວ — ກະລຸນາກວດ ແລະ ແກ້ໄຂຂໍ້ຄວາມໃຫ້ຖືກຕ້ອງກ່ອນກົດ "ຄິດໄລ່ຍອດ" ຫຼື "ເພີ່ມເຂົ້າຕາຕະລາງ"'
               : '⚠ ອ່ານຮູບແລ້ວແຕ່ບໍ່ພົບໂຕເລກ — ລອງຖ່າຍໃໝ່ໃຫ້ຄົມຊັດ ຫຼືພິມເອງ';
           }
         }).catch(function(err){
