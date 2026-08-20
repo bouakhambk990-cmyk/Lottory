@@ -481,10 +481,6 @@
     background:var(--red-bright);color:#fff;font-weight:700;
     padding:1px 5px;border-radius:4px;font-family:"JetBrains Mono","IBM Plex Mono",monospace;
   }
-  .hit-cat{
-    display:inline-block;background:var(--gold);color:#1c1305;font-weight:700;
-    font-size:10.5px;padding:2px 7px;border-radius:10px;
-  }
 
   /* ---- bill ticket receipt: ໃບນ້ອຍໆ ຊົງຍາວ ຄ້າຍໃບຫວຍ ພ້ອມລາຍນ້ຳໂລໂກ ---- */
   .bill-ticket{
@@ -1901,31 +1897,6 @@
       .catch(function(err){ return { ok:false, error: err && err.message ? err.message : String(err) }; });
   }
 
-  // ສ້າງ HTML ຂອງ 1 ແຖວຜົນຄົ້ນຫາ (ໃຊ້ຮ່ວມກັນທັງການຄົ້ນຫາເອງ ແລະ ການຄົ້ນຫາອັດຕະໂນມັດຈາກຜົນລາງວັນ)
-  function buildMatchRowHtml(m, query, rate, categoryLabel){
-    var tokens = String(m.numbers || '').split(/\s+/).filter(function(t){ return t; });
-    var stake = 0;
-    var highlightedNums = tokens.map(function(tok){
-      var parts = tok.split('=');
-      var num = parts[0];
-      if(num === query){
-        stake = parseFloat(parts[1]) || 0;
-        return '<mark class="hit-number">' + escapeHtml(tok) + '</mark>';
-      }
-      return escapeHtml(tok);
-    }).join(' ');
-    var winAmt = rate > 0 ? stake * rate : null;
-    var catBadge = categoryLabel ? '<span class="hit-cat">' + escapeHtml(categoryLabel) + '</span> ' : '';
-    var hitLine = '<div class="hit-amount">' + catBadge + '🎯 ຖືກເລກ <b>' + escapeHtml(query) + '</b> — ຍອດຖືກ <b class="hit-stake">' + KIP(stake) + ' ກີບ</b>' +
-      (winAmt !== null ? ' → ຄາດຄະເນຈ່າຍ <b class="hit-win">' + KIP(winAmt) + ' ກີບ</b> (×' + rate + ')' : '') +
-      '</div>';
-    return '<div class="bill-search-row hit">' +
-      hitLine +
-      '<div class="l">ບີນ #<b>' + escapeHtml(String(m.billNo)) + '</b> · ' + escapeHtml(m.date) + ' ' + escapeHtml(m.time) + ' · ' + escapeHtml(m.username) + '<br>' + highlightedNums + '</div>' +
-      '<div class="r mono">ລວມທັງບີນ: ' + KIP(m.total) + '</div>' +
-    '</div>';
-  }
-
   function renderBillSearchResults(matches, query){
     var wrap = document.getElementById('billSearchResults');
     if(!wrap) return;
@@ -1935,49 +1906,30 @@
     }
     var winInputs = readWinInputs();
     var len = query.length;
-    var rate = (len === 3) ? winInputs.r3 : winInputs.r2; // ຖ້າ 2 ໂຕ ໃຊ້ອັດຕາ "ບົນ" ເປັນຄ່າປະມານ (ຄົ້ນຫາເອງບໍ່ຮູ້ໝວດ)
-    wrap.innerHTML = matches.map(function(m){ return buildMatchRowHtml(m, query, rate, null); }).join('');
-  }
-
-  // ຄົ້ນຫາບີນອັດຕະໂນມັດຈາກ 3 ຊ່ອງຜົນລາງວັນພ້ອມກັນ (ເລກ2ໂຕ, ເລກ3ໂຕ, ເລກ2ໂຕລ່າງ) — ບໍ່ຕ້ອງພິມຄົ້ນຫາເອງ
-  function autoSearchWinningBills(){
-    var winInputs = readWinInputs();
-    var queries = [];
-    if(winInputs.n2) queries.push({ num: winInputs.n2, label: '🔵 ຖືກເລກ 2 ໂຕ (ບົນ)', rate: winInputs.r2 });
-    if(winInputs.n3) queries.push({ num: winInputs.n3, label: '🟣 ຖືກເລກ 3 ໂຕ', rate: winInputs.r3 });
-    if(winInputs.n2b) queries.push({ num: winInputs.n2b, label: '🟠 ຖືກເລກ 2 ໂຕ ລ່າງ', rate: winInputs.r2b });
-
-    var wrap = document.getElementById('billSearchResults');
-    var searchInput = document.getElementById('billSearchInput');
-    if(queries.length === 0){
-      if(wrap) wrap.innerHTML = '';
-      return;
-    }
-    if(searchInput) searchInput.value = queries.map(function(q){ return q.num; }).join(', ');
-    if(!currentUser || !currentUser.sheetUrl){
-      if(wrap) wrap.innerHTML = '<div class="empty-note">ຄົ້ນຫາອັດຕະໂນມັດຕ້ອງມີ Google Sheet ຕັ້ງໄວ້ (Admin)</div>';
-      return;
-    }
-    if(wrap) wrap.innerHTML = '<div class="empty-note">ກຳລັງຄົ້ນຫາບີນທີ່ຖືກ...</div>';
-    Promise.all(queries.map(function(q){
-      return searchBillsNow(q.num).then(function(res){ return { q: q, res: res }; });
-    })).then(function(results){
-      var htmlParts = [];
-      results.forEach(function(item){
-        var matches = (item.res && item.res.ok) ? item.res.matches : [];
-        if(matches && matches.length > 0){
-          matches.forEach(function(m){
-            htmlParts.push(buildMatchRowHtml(m, item.q.num, item.q.rate, item.q.label));
-          });
-        } else {
-          var reason = (item.res && !item.res.ok && item.res.error) ? (' (' + item.res.error + ')') : '';
-          htmlParts.push('<div class="empty-note">' + escapeHtml(item.q.label) + ' "' + escapeHtml(item.q.num) + '" — ບໍ່ພົບບີນທີ່ຖືກ' + escapeHtml(reason) + '</div>');
+    var rate = (len === 3) ? winInputs.r3 : winInputs.r2; // ຖ້າ 2 ໂຕ ໃຊ້ອັດຕາ "ບົນ" ເປັນຄ່າປະມານ (ຂໍ້ມູນບີນບໍ່ໄດ້ແຍກບົນ/ລ່າງ)
+    wrap.innerHTML = matches.map(function(m){
+      var tokens = String(m.numbers || '').split(/\s+/).filter(function(t){ return t; });
+      var stake = 0;
+      var highlightedNums = tokens.map(function(tok){
+        var parts = tok.split('=');
+        var num = parts[0];
+        if(num === query){
+          stake = parseFloat(parts[1]) || 0;
+          return '<mark class="hit-number">' + escapeHtml(tok) + '</mark>';
         }
-      });
-      if(wrap) wrap.innerHTML = htmlParts.join('');
-    });
+        return escapeHtml(tok);
+      }).join(' ');
+      var winAmt = rate > 0 ? stake * rate : null;
+      var hitLine = '<div class="hit-amount">🎯 ຖືກເລກ <b>' + escapeHtml(query) + '</b> — ຍອດຖືກ <b class="hit-stake">' + KIP(stake) + ' ກີບ</b>' +
+        (winAmt !== null ? ' → ຄາດຄະເນຈ່າຍ <b class="hit-win">' + KIP(winAmt) + ' ກີບ</b> (×' + rate + ')' : '') +
+        '</div>';
+      return '<div class="bill-search-row hit">' +
+        hitLine +
+        '<div class="l">ບີນ #<b>' + escapeHtml(String(m.billNo)) + '</b> · ' + escapeHtml(m.date) + ' ' + escapeHtml(m.time) + ' · ' + escapeHtml(m.username) + '<br>' + highlightedNums + '</div>' +
+        '<div class="r mono">ລວມທັງບີນ: ' + KIP(m.total) + '</div>' +
+      '</div>';
+    }).join('');
   }
-
 
   // ---------- parsing helpers ----------
   function parseNumberTokens(str){
@@ -2624,8 +2576,6 @@
     '    if(body.action === "sendTotal") return json_(sendTotal_(body));',
     '    if(body.action === "issueBill") return json_(issueBill_(body));',
     '    if(body.action === "searchBills") return json_(searchBills_(body));',
-    '    if(body.action === "getBoard") return json_(getUserBoard_(body));',
-    '    if(body.action === "saveBoard") return json_(setUserBoard_(body));',
     '    if(body.action === "getUsers") return json_(getUsers_(body));',
     '    if(body.action === "saveUsers") return json_(saveUsers_(body));',
     '    if(body.action === "getAdminPassword") return json_(getAdminPassword_(body));',
@@ -2792,60 +2742,6 @@
     '    return { ok:true, matches: matches };',
     '  }catch(err){',
     '    return { ok:false, error:"ຄົ້ນຫາບໍ່ສຳເລັດ: " + String(err && err.message ? err.message : err) };',
-    '  }',
-    '}',
-    '',
-    '// ================= ຕາຕະລາງເລກ (Number Board) — ຊິ້ງຂໍ້ມູນຂ້າມອຸປະກອນພາຍໃນຜູ້ໃຊ້ດຽວກັນ =================',
-    '// ເກັບ boardState ທັງກ້ອນ (JSON ດຽວ) ໄວ້ໃນແທັບ "Board" ຂອງຊີດຜູ້ໃຊ້ນັ້ນເອງ (ຄືກັນກັບ Bills) —',
-    '// ດັ່ງນັ້ນຜູ້ໃຊ້ຄົນດຽວກັນ ເປີດຈາກອຸປະກອນໃດກໍ່ຕາມ (ໂທລະສັບ/ຄອມ) ຈະເຫັນຂໍ້ມູນດຽວກັນ.',
-    'function getUserBoard_(body){',
-    '  try{',
-    '    if(!body.sheetUrl) return { ok:false, error:"ບໍ່ພົບ Google Sheet URL" };',
-    '    var sheetId = extractSheetId_(body.sheetUrl);',
-    '    if(!sheetId) return { ok:false, error:"ອ່ານ Google Sheet ID ຈາກ URL ບໍ່ໄດ້: " + body.sheetUrl };',
-    '    var ss = SpreadsheetApp.openById(sheetId);',
-    '    var sh = ss.getSheetByName("Board");',
-    '    if(!sh) return { ok:true, boardJson: null };',
-    '    var lastRow = sh.getLastRow();',
-    '    if(lastRow < 2) return { ok:true, boardJson: null };',
-    '    var values = sh.getRange(2,1,lastRow-1,2).getValues();',
-    '    for(var i=0;i<values.length;i++){',
-    '      if(values[i][0] === "boardState") return { ok:true, boardJson: String(values[i][1] || "") };',
-    '    }',
-    '    return { ok:true, boardJson: null };',
-    '  }catch(err){',
-    '    return { ok:false, error:"ອ່ານຕາຕະລາງເລກບໍ່ສຳເລັດ: " + String(err && err.message ? err.message : err) };',
-    '  }',
-    '}',
-    'function setUserBoard_(body){',
-    '  try{',
-    '    if(!body.sheetUrl) return { ok:false, error:"ບໍ່ພົບ Google Sheet URL" };',
-    '    if(typeof body.boardJson !== "string") return { ok:false, error:"ບໍ່ມີຂໍ້ມູນຕາຕະລາງເລກໃຫ້ບັນທຶກ" };',
-    '    var sheetId = extractSheetId_(body.sheetUrl);',
-    '    if(!sheetId) return { ok:false, error:"ອ່ານ Google Sheet ID ຈາກ URL ບໍ່ໄດ້: " + body.sheetUrl };',
-    '    var ss = SpreadsheetApp.openById(sheetId);',
-    '    var sh = ss.getSheetByName("Board");',
-    '    if(!sh){',
-    '      sh = ss.insertSheet("Board");',
-    '      sh.getRange(1,1,1,2).setValues([["key","value"]]);',
-    '    }',
-    '    var lastRow = sh.getLastRow();',
-    '    var foundRow = -1;',
-    '    if(lastRow >= 2){',
-    '      var values = sh.getRange(2,1,lastRow-1,1).getValues();',
-    '      for(var i=0;i<values.length;i++){',
-    '        if(values[i][0] === "boardState"){ foundRow = i+2; break; }',
-    '      }',
-    '    }',
-    '    if(foundRow > 0){',
-    '      sh.getRange(foundRow,2).setValue(body.boardJson);',
-    '    } else {',
-    '      var newRow = Math.max(lastRow+1, 2);',
-    '      sh.getRange(newRow,1,1,2).setValues([["boardState", body.boardJson]]);',
-    '    }',
-    '    return { ok:true };',
-    '  }catch(err){',
-    '    return { ok:false, error:"ບັນທຶກຕາຕະລາງເລກບໍ່ສຳເລັດ: " + String(err && err.message ? err.message : err) };',
     '  }',
     '}',
     '',
@@ -3023,58 +2919,32 @@
       history: []
     };
   }
-  // ປ້ອງກັນໂຄງສ້າງບໍ່ຄົບ (ຂໍ້ມູນເກົ່າ/ເສຍ/ຈາກ server) — ໃຊ້ຮ່ວມກັນທັງໂຫລດຈາກ localStorage ແລະ ຈາກ server
-  function boardSanitize(parsed, def){
-    var st = {
-      amounts: (parsed && parsed.amounts) || def.amounts,
-      limits: (parsed && parsed.limits) || def.limits,
-      history: (parsed && parsed.history) || []
-    };
-    ['lak','thb'].forEach(function(c){
-      if(!st.amounts[c]) st.amounts[c] = {2:{},3:{}};
-      if(!st.amounts[c][2]) st.amounts[c][2] = {};
-      if(!st.amounts[c][3]) st.amounts[c][3] = {};
-    });
-    if(st.history.length > 500) st.history = st.history.slice(0, 500);
-    return st;
-  }
   function loadBoardState(){
     if(boardState) return boardState;
     var def = boardDefaultState();
     try{
       var raw = localStorage.getItem(BOARD_KEY);
-      boardState = raw ? boardSanitize(JSON.parse(raw), def) : def;
+      if(raw){
+        var parsed = JSON.parse(raw);
+        boardState = {
+          amounts: parsed.amounts || def.amounts,
+          limits: parsed.limits || def.limits,
+          history: parsed.history || []
+        };
+        // ປ້ອງກັນໂຄງສ້າງບໍ່ຄົບ (ຂໍ້ມູນເກົ່າ/ເສຍ)
+        ['lak','thb'].forEach(function(c){
+          if(!boardState.amounts[c]) boardState.amounts[c] = {2:{},3:{}};
+          if(!boardState.amounts[c][2]) boardState.amounts[c][2] = {};
+          if(!boardState.amounts[c][3]) boardState.amounts[c][3] = {};
+        });
+      } else {
+        boardState = def;
+      }
     }catch(e){ boardState = def; }
     return boardState;
   }
   function saveBoardState(){
     try{ localStorage.setItem(BOARD_KEY, JSON.stringify(boardState)); }catch(e){}
-  }
-
-  // ---------- ຊິ້ງຕາຕະລາງເລກຂ້າມອຸປະກອນ (ພາຍໃນ user ດຽວກັນ, ຜ່ານຊີດສ່ວນຕົວຂອງ user ນັ້ນ) ----------
-  function boardSyncPossible(){
-    return !!(SHEETS_ENABLED && currentUser && currentUser.sheetUrl && /\/exec$/.test((CONFIG.WEBAPP_URL||'').trim()));
-  }
-  function syncBoardFromServer(){
-    if(!boardSyncPossible()) return Promise.resolve({ ok:false, synced:false });
-    return gsPost({ action:'getBoard', token: CONFIG.SHARED_TOKEN, sheetUrl: currentUser.sheetUrl })
-      .then(function(res){
-        if(res && res.ok && res.boardJson){
-          try{
-            boardState = boardSanitize(JSON.parse(res.boardJson), boardDefaultState());
-            saveBoardState();
-            return { ok:true, synced:true };
-          }catch(e){ return { ok:false, synced:false, error:'ອ່ານຂໍ້ມູນຕາຕະລາງຈາກ Sheet ບໍ່ໄດ້' }; }
-        }
-        return { ok: !!(res && res.ok), synced:false, error: res && res.error };
-      })
-      .catch(function(err){ return { ok:false, synced:false, error: err && err.message ? err.message : String(err) }; });
-  }
-  function syncBoardToServer(){
-    if(!boardSyncPossible()) return Promise.resolve({ ok:false });
-    var st = loadBoardState();
-    return gsPost({ action:'saveBoard', token: CONFIG.SHARED_TOKEN, sheetUrl: currentUser.sheetUrl, boardJson: JSON.stringify(st) })
-      .catch(function(err){ return { ok:false, error: err && err.message ? err.message : String(err) }; });
   }
 
   function boardPadNum(i, len){
@@ -3166,12 +3036,6 @@
 
   // ຈັດຂໍ້ຄວາມທີ່ອ່ານໄດ້ໃຫ້ລຽງກັນສວຍງາມ: ຕັດຊ່ອງຫວ່າງເກີນ, ລຶບແຖວຫວ່າງ/ແຖວທີ່ບໍ່ມີໂຕເລກເລີຍ
   // (ມັກເປັນສິ່ງແປກປົນ/ລາຍນ້ຳທີ່ອ່ານຜິດ), ໂດຍບໍ່ໄປແກ້ໂຕເລກເອງ (ເພື່ອບໍ່ໃຫ້ສ່ຽງແກ້ຜິດ) — ຜູ້ໃຊ້ຍັງຄວນກວດຄືນ.
-  // ຮູ້ຈັກໂຄງສ້າງໃບບີນທີ່ອອກໂດຍ BK Easy ເອງ (ຫົວບີນ/ລາຍເຊັນ/ຍອດລວມ) ເພື່ອຕັດອອກ —
-  // ຖ້າຖ່າຍຮູບໃບບີນທີ່ອອກຈາກແອັບນີ້ເອງມາອ່ານຄືນ, ຈະໄດ້ຂໍ້ຄວາມທີ່ພ້ອມວາງໃຊ້ຄືນເລີຍ ບໍ່ຕ້ອງແກ້ຫຍັງ.
-  var OCR_BILL_BOILERPLATE_RE = [
-    /ບີນເລກທີ/, /ເວລາ/, /ຜູ້ອອກບີນ/, /ລວມລາຄາ/, /BK\s*Easy/i,
-    /ຄລິກດຽວຈົບ/, /ງ່າຍສະບາຍ/, /ຂໍໃຫ້ທ່ານໂຊກດີ/, /ໃບຄິດເລກ/
-  ];
   function cleanOcrText(raw){
     var lines = String(raw || '').split(/\r?\n/);
     var cleaned = [];
@@ -3179,12 +3043,7 @@
       var t = lines[i].replace(/[ \t]+/g, ' ').trim();
       if(!t) continue;
       if(!/\d/.test(t)) continue; // ຕັດແຖວທີ່ບໍ່ມີໂຕເລກເລີຍ (ມັກເປັນສິ່ງແປກປົນ)
-      if(OCR_BILL_BOILERPLATE_RE.some(function(re){ return re.test(t); })) continue; // ຫົວ/ທ້າຍໃບບີນ BK Easy
-      if(/^[\d,]{4,}\s*(ກີບ|kip)?$/i.test(t)) continue; // ຄໍລຳ "ລວມລາຄາ" ທີ່ຈັດຮູບແບບແລ້ວ (ມີຈຸດຄັ່ນຫລັກພັນ) ຫລົ່ນມາເປັນແຖວດ່ຽວ
-      // ຖ້າແຖວແມ່ນຮູບແບບ "...=ລາຄາ" ຕິດຕາມດ້ວຍຄໍລຳຍອດລວມທີ່ຈັດຮູບແບບແລ້ວຢູ່ທ້າຍແຖວດຽວກັນ
-      // (ຄືອອກມາຈາກໃບບີນ BK Easy: "889 688 = 20   100,000") — ຕັດເອົາສະເພາະ "...=ລາຄາ" ອອກມາ
-      var m = t.match(/^(.*=\s*[\d.]+)\s+[\d,]{4,}\s*(ກີບ|kip)?$/i);
-      cleaned.push(m ? m[1].trim() : t);
+      cleaned.push(t);
     }
     return cleaned.join('\n');
   }
@@ -3215,11 +3074,11 @@
       });
     });
     saveBoardState();
-    syncBoardToServer();
   }
 
   function boardComputeStats(currency, digits){
     var st = loadBoardState();
+    var bucket = st.amounts[currency][digits] || {};
     var keys = Object.keys(bucket).filter(function(k){ return bucket[k] > 0; });
     var total = 0, top = null, topAmt = -1;
     keys.forEach(function(k){
@@ -3243,7 +3102,6 @@
     var val = input ? input.value.replace(/,/g,'').trim() : '';
     st.limits[key] = val ? parseFloat(val) : null;
     saveBoardState();
-    syncBoardToServer();
     boardRenderAll();
   }
 
@@ -3345,7 +3203,6 @@
     bucket[num] = cur - amount;
     st.history.unshift({ time: new Date().toISOString(), number: num, digits: boardCurrentDigits, currency: boardCurrentCurrency, amount: amount, recipient: recipient, type: 'export' });
     saveBoardState();
-    syncBoardToServer();
     if(statusEl) statusEl.textContent = '✅ ສົ່ງອອກສຳເລັດ';
     boardRenderAll();
     boardOpenExportForm(num);
@@ -3362,7 +3219,6 @@
     bucket[num] = 0;
     st.history.unshift({ time: new Date().toISOString(), number: num, digits: boardCurrentDigits, currency: boardCurrentCurrency, amount: cur, recipient: '', type: 'remove' });
     saveBoardState();
-    syncBoardToServer();
     boardRenderAll();
     if(formEl) formEl.style.display = 'none';
   }
@@ -3379,18 +3235,7 @@
         var view = this.getAttribute('data-view');
         betPanel.style.display = (view === 'betting') ? '' : 'none';
         boardPanel.style.display = (view === 'board') ? '' : 'none';
-        if(view === 'board'){
-          boardRenderAll();
-          if(boardSyncPossible()){
-            var statusEl = document.getElementById('boardInputStatus');
-            if(statusEl) statusEl.textContent = 'ກຳລັງດຶງຂໍ້ມູນຕາຕະລາງລ່າສຸດ (ຊິ້ງຂ້າມອຸປະກອນ)...';
-            syncBoardFromServer().then(function(res){
-              boardSyncLimitInput();
-              boardRenderAll();
-              if(statusEl) statusEl.textContent = res.synced ? '✅ ຊິ້ງຂໍ້ມູນລ່າສຸດແລ້ວ' : (res.ok ? '' : ('⚠ ຊິ້ງບໍ່ໄດ້: ' + (res.error || 'ບໍ່ຮູ້ສາເຫດ')));
-            });
-          }
-        }
+        if(view === 'board') boardRenderAll();
       });
     }
   }
@@ -3477,11 +3322,10 @@
     var resetBtn = document.getElementById('boardResetBtn');
     if(resetBtn){
       resetBtn.addEventListener('click', function(){
-        if(!confirm('ລ້າງຂໍ້ມູນຕາຕະລາງເລກ + ປະຫວັດທັງໝົດ? ນີ້ບໍ່ສາມາດກູ້ຄືນໄດ້ (ຈະລ້າງຢູ່ Sheet ນຳ ຖ້າມີການຊິ້ງໄວ້)')) return;
+        if(!confirm('ລ້າງຂໍ້ມູນຕາຕະລາງເລກ + ປະຫວັດທັງໝົດ? ນີ້ບໍ່ສາມາດກູ້ຄືນໄດ້')) return;
         boardState = null;
         try{ localStorage.removeItem(BOARD_KEY); }catch(e){}
         loadBoardState();
-        syncBoardToServer();
         boardSyncLimitInput();
         boardRenderAll();
       });
@@ -3595,10 +3439,8 @@
       el.addEventListener('input', debounce(function(){
         lsSet(f[1], el.value);
         render();
-        autoSearchWinningBills();
       }, 250));
     });
-    autoSearchWinningBills(); // ຄົ້ນຫາທັນທີຖ້າມີຄ່າຄ້າງໄວ້ຈາກຄັ້ງກ່ອນ (localStorage)
 
     var clearBtn = document.getElementById('clearBtn');
     if(clearBtn){
