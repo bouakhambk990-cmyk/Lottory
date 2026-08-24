@@ -523,9 +523,7 @@
     background:rgba(255,255,255,.55);border:1px solid #e4dcc0;border-radius:6px;
     padding:6px 10px;font-size:11.5px;
   }
-  .bill-item-nums{color:#2b2b28;word-break:break-word;flex:1;margin-right:8px;display:flex;flex-direction:column;gap:2px;}
-  .bill-item-formula{font-size:10.5px;color:#8a7f5f;}
-  .bill-item-expanded{font-size:12px;color:#2b2b28;font-weight:600;}
+  .bill-item-nums{color:#2b2b28;word-break:normal;overflow-wrap:normal;white-space:normal;flex:1;margin-right:8px;}
   .bill-item-price{color:#a3721a;white-space:nowrap;font-weight:600;}
   .bill-total{
     display:flex;justify-content:space-between;align-items:center;
@@ -1815,13 +1813,20 @@
   }
 
   // ໃບບີນແບບຕີ້ຄິດ (ຄ້າຍໃບຫວຍທົ່ວໄປ): ຫົວ ​+ ເລກທີ່ບີນ/ວັນທີ + ຕາຕະລາງ 2 ຄໍ (ຊຸດເລກ | ລາຄາ) + ລວມ + ລາຍເຊັນ
+  // ໃສ່ຈຸດຕັດແຖວແບບປອດໄພ (zero-width space) ຫລັງເຄື່ອງໝາຍຄັ່ນເທົ່ານັ້ນ (- , ; /) ເພື່ອບໍ່ໃຫ້ browser
+  // ຕັດແຖວກາງໂຕເລກໂດຍບັງເອີນ (ເຊັ່ນ "92" ແຕກເປັນ "9" ແລ້ວ "2" ຄົນລະແຖວ) — ຮັບປະກັນວ່າຈະຕັດແຖວ
+  // ໄດ້ສະເພາະລະຫວ່າງເລກແຕ່ລະໂຕເທົ່ານັ້ນ.
+  function safeBreakRaw(s){
+    return escapeHtml(s).replace(/([,\-;\/])/g, '$1\u200B');
+  }
+
   function renderBillReceipt(bill){
     var wrap = document.getElementById('billReceiptWrap');
     if(!wrap) return;
     var brand = getBrandTextCached();
     var cellsHtml = bill.groups.map(function(g){
       return '<div class="bill-item">' +
-        '<span class="bill-item-nums mono">' + escapeHtml(g.raw) + '</span>' +
+        '<span class="bill-item-nums mono">' + safeBreakRaw(g.raw) + '</span>' +
         '<span class="bill-item-price mono">' + KIP(g.total) + '</span>' +
       '</div>';
     }).join('');
@@ -1987,7 +1992,7 @@
   function parseNumberTokens(str){
     return str.split(/[,.\-_;\/\s]+/)
       .map(function(s){ return s.trim(); })
-      .filter(function(s){ return s.length > 0 && /^\d+$/.test(s); });
+      .filter(function(s){ return s.length > 0 && s.length <= 3 && /^\d+$/.test(s); });
   }
 
   function parseSinglePrice(token, literal){
