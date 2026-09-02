@@ -955,14 +955,17 @@
           </div>
         </div>
         <div class="prize-sheet-sync" id="prizeSheetSync" style="margin-top:10px;">
-          <label class="field-label" for="winResultDateInput" style="margin-top:0;">ວັນທີຜົນເລກ (ບັນທຶກ/ຄິດໄລ່ຈາກ Google Sheet)</label>
+          <label class="field-label" for="winResultDateInput" style="margin-top:0;">ວັນທີຜົນເລກ (ບັນທຶກ/ຄິດໄລ່/ຄົ້ນຫາຈາກ Google Sheet)</label>
           <input type="date" id="winResultDateInput" class="mono">
+          <label class="field-label" for="winResultTimeInput">ເວລາປິດຮັບ (ຄົ້ນຫາສະເພາະບີນທີ່ອອກກ່ອນ/ຮອດເວລານີ້ — ຫວ່າງໄວ້ = ບໍ່ກອງເວລາ)</label>
+          <input type="time" id="winResultTimeInput" class="mono">
           <div class="board-btn-row" style="margin-top:8px;">
             <button type="button" class="mini-btn gold" id="saveWinResultBtn">💾 ບັນທຶກຜົນເລກລົງ Google Sheet</button>
             <button type="button" class="mini-btn" id="loadWinResultBtn">📥 ດຶງຜົນເລກຈາກ Google Sheet</button>
           </div>
-          <label class="field-label" for="dailySummaryCurrencySelect">ສະກຸນເງິນ (ສຳລັບຄິດໄລ່ຍອດຮັບ-ສົ່ງ)</label>
+          <label class="field-label" for="dailySummaryCurrencySelect">ສະກຸນເງິນ (ສຳລັບຄົ້ນຫາບີນຖືກ + ຄິດໄລ່ຍອດຮັບ-ສົ່ງ)</label>
           <select id="dailySummaryCurrencySelect" class="mono">
+            <option value="any">ທຸກສະກຸນເງິນ (ກີບ+ບາດ) — ໃຊ້ຄົ້ນຫາໄດ້ຢ່າງດຽວ</option>
             <option value="lak">ກີບ (LAK)</option>
             <option value="thb">ບາດ (THB)</option>
           </select>
@@ -1689,6 +1692,10 @@
     var el = document.getElementById('winResultDateInput');
     return (el && el.value) ? el.value : billDateStr();
   }
+  function winResultTimeStr(){
+    var el = document.getElementById('winResultTimeInput');
+    return (el && el.value) ? el.value : '';
+  }
   function saveWinResultNow(){
     if(!currentUser || !currentUser.sheetUrl){
       return Promise.resolve({ ok:false, error:'ຜູ້ໃຊ້ນີ້ຍັງບໍ່ໄດ້ຕັ້ງ Google Sheet' });
@@ -1725,10 +1732,14 @@
     if(!/\/exec$/.test((CONFIG.WEBAPP_URL||'').trim())){
       return Promise.resolve({ ok:false, error:'CONFIG.WEBAPP_URL ຍັງບໍ່ຖືກຕ້ອງ' });
     }
-    var winInputs = readWinInputs();
-    var pct = parseFloat(document.getElementById('pctInput').value) || 0;
     var curSel = document.getElementById('dailySummaryCurrencySelect');
     var currency = curSel ? curSel.value : 'lak';
+    if(currency === 'any'){
+      // ຄິດໄລ່ຍອດຮັບ-ສົ່ງເປັນຕົວເລກເງິນ, ຈຶ່ງລວມ 2 ສະກຸນເຂົ້າກັນບໍ່ໄດ້ — ຕ້ອງເລືອກສະເພາະສະກຸນດຽວ (ຄົ້ນຫາເທົ່ານັ້ນທີ່ໃຊ້ "ທຸກສະກຸນ" ໄດ້)
+      return Promise.resolve({ ok:false, error:'ກະລຸນາເລືອກສະກຸນເງິນສະເພາະ (ກີບ ຫລື ບາດ) ກ່ອນຄິດໄລ່ຍອດຮັບ-ສົ່ງ — "ທຸກສະກຸນເງິນ" ໃຊ້ໄດ້ສະເພາະຄົ້ນຫາບີນຖືກເທົ່ານັ້ນ' });
+    }
+    var winInputs = readWinInputs();
+    var pct = parseFloat(document.getElementById('pctInput').value) || 0;
     var billTab = (currency === 'thb') ? 'Bills_THB' : 'Bills';
     return gsPost({
       action: 'dailySummary', token: CONFIG.SHARED_TOKEN, sheetUrl: currentUser.sheetUrl, billTab: billTab,
@@ -1925,13 +1936,32 @@
     function runBillSearch(){
       var q = searchInput ? searchInput.value.trim() : '';
       if(!q){ if(searchResultsWrap) searchResultsWrap.innerHTML = '<div class="empty-note">ກະລຸນາພິມເລກທີ່ຈະຄົ້ນຫາ</div>'; return; }
+      // ໃຊ້ວັນທີ/ເວລາ/ສະກຸນເງິນ ຈາກກ່ອງ 🎯 ຜົນລາງວັນ (ບ່ອນດຽວ, ບໍ່ຊ້ຳກັບບ່ອນອື່ນ) — ຜົນຄົ້ນຫາຍັງສະແດງຢູ່ບ່ອນເກົ່ານີ້
+      var dateStr = winResultDateStr();
+      var timeStr = winResultTimeStr();
+      var curSel = document.getElementById('dailySummaryCurrencySelect');
+      var currency = curSel ? curSel.value : 'any';
       if(searchResultsWrap) searchResultsWrap.innerHTML = '<div class="empty-note">ກຳລັງຄົ້ນຫາ...</div>';
-      searchBillsNow(q).then(function(res){
-        if(res && res.ok){
-          renderBillSearchResults(res.matches, q);
-        } else if(searchResultsWrap){
-          searchResultsWrap.innerHTML = '<div class="empty-note">ຄົ້ນຫາບໍ່ໄດ້: ' + escapeHtml(res && res.error ? res.error : 'ບໍ່ຮູ້ສາເຫດ') + '</div>';
+      // "any" = ຄົ້ນທັງ 2 ຊິດ (ກີບ ແລະ ບາດ) ພ້ອມກັນ ແລ້ວລວມຜົນສະແດງໃຫ້ (ຕິດປ້າຍສະກຸນເງິນແຍກແຕ່ລະບີນ)
+      var tabsToSearch = (currency === 'lak') ? [{ billTab:'Bills', currency:'lak' }] :
+                         (currency === 'thb') ? [{ billTab:'Bills_THB', currency:'thb' }] :
+                         [{ billTab:'Bills', currency:'lak' }, { billTab:'Bills_THB', currency:'thb' }];
+      Promise.all(tabsToSearch.map(function(t){
+        return searchBillsNow(q, 'any', t.billTab, dateStr, timeStr).then(function(res){ return { t:t, res:res }; });
+      })).then(function(results){
+        var anyOk = results.some(function(r){ return r.res && r.res.ok; });
+        if(!anyOk){
+          var firstErr = results.map(function(r){ return r.res && r.res.error; }).filter(Boolean)[0];
+          if(searchResultsWrap) searchResultsWrap.innerHTML = '<div class="empty-note">ຄົ້ນຫາບໍ່ໄດ້: ' + escapeHtml(firstErr || 'ບໍ່ຮູ້ສາເຫດ') + '</div>';
+          return;
         }
+        var allMatches = [];
+        results.forEach(function(r){
+          if(r.res && r.res.ok){
+            (r.res.matches || []).forEach(function(m){ m._currency = r.t.currency; allMatches.push(m); });
+          }
+        });
+        renderBillSearchResults(allMatches, q);
       });
     }
     if(searchBtn) searchBtn.addEventListener('click', runBillSearch);
@@ -2113,14 +2143,16 @@
   // category: 'top' = ຄົ້ນຫາສະເພາະຊິດເລກ "ບົນ" (ລວມ 3 ໂຕ), 'bottom' = ຄົ້ນຫາສະເພາະຊິດເລກ "ລ່າງ" (ບີນທີ່ມີ
   // ເດີມພັນ ລ່າງ ຫລື ບົນລ່າງ ຢ່າງແທ້ຈິງເທົ່ານັ້ນ), 'any'/ບໍ່ໃສ່ = ຄົ້ນຫາທັງ 2 ຊິດ (ໃຊ້ກັບການຄົ້ນຫາເອງທົ່ວໄປ)
   // billTab: 'Bills' (ກີບ, default) ຫລື 'Bills_THB' (ບາດ) — ແຍກຊິດຕາມສະກຸນເງິນ
-  function searchBillsNow(query, category, billTab){
+  // dateStr: ຖ້າໃສ່ (yyyy-MM-dd) = ຄົ້ນສະເພາະບີນຂອງວັນທີນັ້ນເທົ່ານັ້ນ, ຖ້າຫວ່າງ = ຄົ້ນທຸກວັນທີ (ຄືເກົ່າ)
+  // timeStr: ຖ້າໃສ່ (HH:mm) = "ເວລາປິດຮັບ" — ຄົ້ນສະເພາະບີນທີ່ອອກກ່ອນ/ຮອດເວລານີ້ເທົ່ານັ້ນ, ຖ້າຫວ່າງ = ບໍ່ກອງເວລາ
+  function searchBillsNow(query, category, billTab, dateStr, timeStr){
     if(!currentUser || !currentUser.sheetUrl){
       return Promise.resolve({ ok:false, error:'ຜູ້ໃຊ້ນີ້ຍັງບໍ່ໄດ້ຕັ້ງ Google Sheet — ຄົ້ນຫາໄດ້ສະເພາະຜູ້ໃຊ້ທີ່ມີ Sheet' });
     }
     if(!/\/exec$/.test((CONFIG.WEBAPP_URL||'').trim())){
       return Promise.resolve({ ok:false, error:'CONFIG.WEBAPP_URL ຍັງບໍ່ຖືກຕ້ອງ' });
     }
-    return gsPost({ action:'searchBills', token: CONFIG.SHARED_TOKEN, sheetUrl: currentUser.sheetUrl, billTab: billTab || 'Bills', query: query, category: category || 'any' })
+    return gsPost({ action:'searchBills', token: CONFIG.SHARED_TOKEN, sheetUrl: currentUser.sheetUrl, billTab: billTab || 'Bills', query: query, category: category || 'any', dateStr: dateStr || '', timeStr: timeStr || '' })
       .catch(function(err){ return { ok:false, error: err && err.message ? err.message : String(err) }; });
   }
 
@@ -2140,7 +2172,7 @@
       }
       return escapeHtml(tok);
     }).join(' ');
-    var winAmt = rate > 0 ? stake * rate : null;
+    var winAmt = rate > 0 ? roundToNearestThousand(stake * rate) : null;
     var catBadge = categoryLabel ? '<span class="hit-cat">' + escapeHtml(categoryLabel) + '</span> ' : '';
     var countNote = hitCount > 1 ? ' <span class="hit-count">(ຖືກ ' + hitCount + ' ເທື່ອໃນບີນນີ້)</span>' : '';
     var hitLine = '<div class="hit-amount">' + catBadge + '🎯 ຖືກເລກ <b>' + escapeHtml(query) + '</b>' + countNote + ' — ຍອດຖືກ <b class="hit-stake">' + KIP(stake) + ' ' + curUnit + '</b>' +
@@ -2195,7 +2227,7 @@
       queries.push({ num:q.num, label:q.label + ' ฿', rate:q.rate, category:q.category, billTab:'Bills_THB', currency:'thb' });
     });
     Promise.all(queries.map(function(q){
-      return searchBillsNow(q.num, q.category, q.billTab).then(function(res){ return { q: q, res: res }; });
+      return searchBillsNow(q.num, q.category, q.billTab, winResultDateStr(), winResultTimeStr()).then(function(res){ return { q: q, res: res }; });
     })).then(function(results){
       var htmlParts = [];
       results.forEach(function(item){
@@ -2536,6 +2568,15 @@
   // ຄ່າ topValue/bottomValue ຂອງແຕ່ລະແຖວ (rows[i]) ໄດ້ຖືກແຍກໄວ້ໃຫ້ຖືກຕ້ອງແລ້ວ
   // ຕັ້ງແຕ່ຂັ້ນຕອນ parseAll — ຟັງຊັນນີ້ພຽງແຕ່ລວມມັນຕາມເລກທີ່ຖືກລາງວັນ.
   // currency: 'lak' (default) ຫລື 'thb' — ຄິດໄລ່ລາງວັນສະເພາະແຖວທີ່ເປັນສະກຸນເງິນນັ້ນເທົ່ານັ້ນ (ບໍ່ປົນກັນ)
+  // ປັດເສດຍອດຈ່າຍລາງວັນເປັນຫລັກພັນ: ເສດ 500 ຂຶ້ນໄປ ປັດຂຶ້ນເປັນ 1,000 / ຕ່ຳກວ່າ 500 ປັດລົງເປັນ 0
+  // ໃຊ້ຮ່ວມກັນທັງ 2 ຝັ່ງ (client ນີ້ ແລະ ສະບັບ GAS ໃນ dailySummary_) — ຕ້ອງໃຫ້ຄິດໄລ່ໄດ້ຄ່າດຽວກັນສະເໝີ
+  function roundToNearestThousand(v){
+    var n = Math.round(v || 0);
+    var rem = ((n % 1000) + 1000) % 1000; // ກັນຄ່າຕິດລົບ
+    var base = n - rem;
+    return rem >= 500 ? base + 1000 : base;
+  }
+
   function computeWinnings(rows, win, currency){
     var cur = currency || 'lak';
     var groups = {};
@@ -2557,17 +2598,17 @@
     Object.keys(groups).forEach(function(num){
       var g = groups[num];
       if(win.n2 && num === win.n2 && g.topStake > 0){
-        var amt = g.topStake * win.r2;
+        var amt = roundToNearestThousand(g.topStake * win.r2);
         win2Amount += amt;
         win2Rows.push({ number:num, stake:g.topStake, amount:amt });
       }
       if(win.n2b && num === win.n2b && g.bottomStake > 0){
-        var amtb = g.bottomStake * win.r2b;
+        var amtb = roundToNearestThousand(g.bottomStake * win.r2b);
         win2BottomAmount += amtb;
         win2BRows.push({ number:num, stake:g.bottomStake, amount:amtb });
       }
       if(win.n3 && num === win.n3 && g.threeStake > 0){
-        var amt3 = g.threeStake * win.r3;
+        var amt3 = roundToNearestThousand(g.threeStake * win.r3);
         win3Amount += amt3;
         win3Rows.push({ number:num, stake:g.threeStake, amount:amt3 });
       }
@@ -3087,6 +3128,9 @@
     '    var query = String(body.query || "").trim();',
     '    if(!query) return { ok:false, error:"ບໍ່ມີເລກທີ່ຄົ້ນຫາ" };',
     '    var category = String(body.category || "any");',
+    '    var filterDate = String(body.dateStr || "").trim(); // ຫວ່າງ = ບໍ່ກອງວັນທີ (ຄົ້ນທຸກວັນທີ)',
+    '    var filterTimeRaw = String(body.timeStr || "").trim(); // "ເວລາປິດຮັບ" ຫວ່າງ = ບໍ່ກອງເວລາ',
+    '    var filterTime = filterTimeRaw ? (filterTimeRaw.length === 5 ? filterTimeRaw + ":00" : filterTimeRaw) : ""; // "14:30" -> "14:30:00"',
     '    var sheetId = extractSheetId_(body.sheetUrl);',
     '    if(!sheetId) return { ok:false, error:"ອ່ານ Google Sheet ID ຈາກ URL ບໍ່ໄດ້: " + body.sheetUrl };',
     '    var ss = SpreadsheetApp.openById(sheetId);',
@@ -3102,6 +3146,8 @@
     '        .map(function(t){ return t.split("=")[0]; }); // "27=10" -> "27" ກ່ອນປຽບທຽບ',
     '    };',
     '    for(var i=0;i<data.length;i++){',
+    '      if(filterDate && normDate_(data[i][0]) !== filterDate) continue;',
+    '      if(filterTime && normTime_(data[i][1]) > filterTime) continue; // ຄົ້ນສະເພາະບີນທີ່ອອກກ່ອນ/ຮອດ "ເວລາປິດຮັບ" ເທົ່ານັ້ນ',
     '      var topCell = String(data[i][4] || "");',
     '      var bottomCell = String(data[i][5] || "");',
     '      var totalVal = data[i][6];',
@@ -3219,7 +3265,7 @@
     '    var n2 = String(body.n2||""), n3 = String(body.n3||""), n2b = String(body.n2b||"");',
     '    var r2 = Number(body.r2)||0, r3 = Number(body.r3)||0, r2b = Number(body.r2b)||0;',
     '    var totalAll = 0, billCount = 0;',
-    '    var win2Amount = 0, win3Amount = 0, win2BottomAmount = 0;',
+    '    var win2Stake = 0, win3Stake = 0, win2BottomStake = 0;',
     '    if(billSh){',
     '      var lastRow = billSh.getLastRow();',
     '      if(lastRow >= 2){',
@@ -3238,15 +3284,21 @@
     '          if(totalVal === undefined || totalVal === "") totalVal = data[i][5]; // ຮອງຮັບແຖວຮູບແບບເກົ່າ (6 ຄໍລຳ)',
     '          totalAll += Number(totalVal) || 0;',
     '          parseTokens(topCell).forEach(function(tok){',
-    '            if(n2 && tok.num === n2 && tok.num.length === 2) win2Amount += tok.stake * r2;',
-    '            if(n3 && tok.num === n3 && tok.num.length === 3) win3Amount += tok.stake * r3;',
+    '            if(n2 && tok.num === n2 && tok.num.length === 2) win2Stake += tok.stake;',
+    '            if(n3 && tok.num === n3 && tok.num.length === 3) win3Stake += tok.stake;',
     '          });',
     '          parseTokens(bottomCell).forEach(function(tok){',
-    '            if(n2b && tok.num === n2b) win2BottomAmount += tok.stake * r2b;',
+    '            if(n2b && tok.num === n2b) win2BottomStake += tok.stake;',
     '          });',
     '        }',
     '      }',
     '    }',
+    '    // ປັດເສດຍອດຈ່າຍລາງວັນເປັນຫລັກພັນ: ເສດ 500 ຂຶ້ນໄປ ປັດຂຶ້ນເປັນ 1,000 / ຕ່ຳກວ່າ 500 ປັດລົງເປັນ 0',
+    '    // (ຄິດໄລ່ຢູ່ນີ້ຄືກັນກັບຝັ່ງ client — ຄິດລວມ stake ຂອງເລກນັ້ນທັງໝົດກ່ອນ ແລ້ວປັດເສດຄັ້ງດຽວຫລັງຄູນອັດຕາ)',
+    '    var roundTo1000_ = function(v){ var n = Math.round(v||0); var rem = ((n % 1000) + 1000) % 1000; var base = n - rem; return rem >= 500 ? base + 1000 : base; };',
+    '    var win2Amount = roundTo1000_(win2Stake * r2);',
+    '    var win3Amount = roundTo1000_(win3Stake * r3);',
+    '    var win2BottomAmount = roundTo1000_(win2BottomStake * r2b);',
     '    var totalReceive = totalAll * (pct/100);',
     '    var totalSendBeforeWin = totalAll - totalReceive;',
     '    var totalWinAmount = win2Amount + win3Amount + win2BottomAmount;',
