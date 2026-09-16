@@ -116,11 +116,15 @@
 
   .grid{
     display:grid;
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr); /* minmax(0,1fr) ບໍ່ແມ່ນ 1fr ຕົງໆ — 1fr ຢ່າງດຽວມີ
+      "automatic minimum size" ແອບແຝງ (ອີງໃສ່ເນື້ອໃນຂ້າງໃນທີ່ກວ້າງທີ່ສຸດ, ເຊັ່ນ min-width ຂອງປຸ່ມແທັບ)
+      ເຮັດໃຫ້ column ນີ້ປະຕິເສດບໍ່ຍອມແຄບກວ່ານັ້ນ ຈຶ່ງເຮັດໃຫ້ໜ້າທັງໝົດເລື່ອນຊ້າຍ-ຂວາໄດ້ (horizontal overflow)
+      ຢູ່ໜ້າຈໍນ້ອຍ — ນີ້ຄືສາເຫດແທ້ຈິງຂອງແຖບທີ່ບໍ່ເທົ່າກັນ/ຖືກຕັດຂອບ ທີ່ລາຍງານມາຫລາຍຄັ້ງ. minmax(0,1fr) ບັງຄັບ
+      ໃຫ້ຄ່າຕ່ຳສຸດເປັນ 0 ແທນ ຈຶ່ງແຄບລົງໄດ້ພໍດີກັບກ່ອງພໍ່ແມ່ສະເໝີ. */
     gap:22px;
     align-items:start;
   }
-  @media(max-width:900px){ .grid{grid-template-columns:1fr;} }
+  @media(max-width:900px){ .grid{grid-template-columns:minmax(0,1fr);} }
 
   .panel{
     background:linear-gradient(180deg,var(--panel),var(--panel-alt));
@@ -129,6 +133,9 @@
     padding:20px;
     position:relative;
     overflow:hidden;
+    min-width:0; /* ສຳຄັນ: grid item ຄ່າເລີ່ມຕົ້ນຄື min-width:auto ເຮັດໃຫ້ .panel ບໍ່ຍອມແຄບກວ່າເນື້ອໃນ
+      ຂ້າງໃນທີ່ກວ້າງທີ່ສຸດ (ເຊັ່ນ .board-tab ທີ່ຕັ້ງ min-width ໄວ້) — ນີ້ຄືສາເຫດແທ້ຈິງທີ່ເຮັດໃຫ້ໜ້າທັງໝົດ
+      ເລື່ອນຊ້າຍ-ຂວາໄດ້ (horizontal overflow) ແລະ ເຮັດໃຫ້ແຖບຕ່າງໆເບິ່ງຄືບໍ່ເທົ່າກັນ/ຖືກຕັດຂອບ ຢູ່ໜ້າຈໍນ້ອຍ */
   }
   .panel::before{
     content:'';
@@ -404,7 +411,8 @@
     white-space:nowrap;
   }
   tbody tr.banned td{color:var(--red-bright);}
-  tbody tr.banned td.num::after{content:" ⛔";}
+  tbody tr.banned td.num{text-decoration:line-through;text-decoration-thickness:2px;}
+  tbody tr.banned td.num::after{content:" ⛔";text-decoration:none;display:inline-block;}
   td.num{font-weight:700;letter-spacing:.03em;}
   td.right, th.right{text-align:right;}
 
@@ -477,6 +485,14 @@
   .quick-sheet-actions.compact-row .btn.compact{min-width:0;padding:8px 16px;font-size:12.5px;}
   .sheet-status.compact{font-size:12px;margin-top:8px;}
   .bill-search-box{display:flex;gap:8px;margin-top:12px;}
+  .qr-box{margin:10px auto 0;max-width:560px;padding:10px 14px;border:1px solid rgba(250,204,21,.35);border-radius:10px;background:rgba(0,0,0,.18);}
+  .qr-box-head{display:flex;align-items:center;gap:8px;}
+  .qr-file-label{cursor:pointer;user-select:none;}
+  #qrHeadThumb img{width:28px;height:28px;border-radius:4px;background:#fff;padding:2px;vertical-align:middle;}
+  #qrPreviewWrap img{max-width:90px;border-radius:8px;display:block;background:#fff;padding:4px;}
+  .bill-qr{text-align:center;margin-top:10px;}
+  .bill-qr img{max-width:56px;border-radius:6px;background:#fff;padding:3px;}
+  .bill-qr div{font-size:10px !important;}
   .bill-search-box input{
     flex:1;min-width:0;background:var(--panel-alt);border:1px solid var(--line-soft);
     border-radius:8px;padding:8px 10px;color:var(--cream);font-size:13px;
@@ -570,7 +586,7 @@
     display:flex;gap:6px;background:var(--panel-alt);border:1px solid var(--line-soft);
     border-radius:10px;padding:4px;margin-bottom:16px;flex-wrap:wrap;
   }
-  .main-view-tabs .board-tab{flex:1;min-width:150px;text-align:center;padding:9px 14px;font-size:12.5px;}
+  .main-view-tabs .board-tab{flex:1;min-width:0;text-align:center;padding:9px 8px;font-size:12px;white-space:normal;line-height:1.3;}
   .board-tabs{display:flex;gap:6px;background:var(--panel-alt);border:1px solid var(--line-soft);border-radius:10px;padding:4px;}
   .board-tab{
     background:transparent;border:none;color:var(--cream-dim);font-size:12.5px;
@@ -619,7 +635,9 @@
   .board-export-title b{color:var(--gold-bright);}
 
   /* ---- syntax guide modal ---- */
-  .guide-trigger-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+  .guide-trigger-row{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;margin-bottom:14px;width:100%;background:var(--panel-alt);border:1px solid var(--line-soft);border-radius:8px;padding:8px 12px;overflow-x:auto;box-sizing:border-box;}
+  .guide-trigger-row > span{white-space:nowrap;}
+  .guide-trigger-row .mini-btn{flex-shrink:0;}
   #modalOverlay{
     position:fixed; inset:0; z-index:60;
     background:rgba(8,15,11,.88);
@@ -709,6 +727,9 @@
   }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- Firebase (ໃຊ້ compat SDK ຜ່ານ CDN ໂດຍກົງ ບໍ່ຕ້ອງ build/bundler ຍ້ອນໄຟລ໌ນີ້ເປັນ HTML ດ່ຽວ) — ໃຊ້ Firestore ເປັນບ່ອນສຳຮອງຂໍ້ມູນ (ບີນ/ຍອດສະຫລຸບ) ຄຽງຄູ່ກັບ Google Sheet ຫລັກ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
@@ -791,6 +812,25 @@
     </div>
   </header>
 
+  <div class="qr-box" id="qrBox" style="display:none;">
+    <div class="qr-box-head" id="qrBoxHead">
+      <span class="stub-title mono" style="margin:0;">💳 QR ໂອນເງິນ</span>
+      <span id="qrHeadThumb"></span>
+      <button type="button" class="mini-btn" id="qrToggleBtn" style="margin-left:auto;">▼ ສະແດງ</button>
+    </div>
+    <div id="qrBoxBody" style="display:none;">
+      <div class="empty-note" style="margin-top:4px;">ສະແດງຢູ່ໃນໃບບີນ — ອັບໂຫລດເອງໄດ້, ບໍ່ຕ້ອງລໍ Admin</div>
+      <label class="mini-btn gold qr-file-label" for="qrFileInput" style="display:inline-block;margin-top:8px;">📁 ເລືອກຮູບ QR</label>
+      <input type="file" id="qrFileInput" accept="image/*" class="mono" style="display:none;">
+      <div id="qrPreviewWrap" style="margin-top:8px;"></div>
+      <div class="board-btn-row" style="margin-top:8px;">
+        <button type="button" class="mini-btn gold" id="qrSaveBtn">💾 ບັນທຶກ QR</button>
+        <button type="button" class="mini-btn" id="qrRemoveBtn">🗑️ ລຶບ QR</button>
+      </div>
+      <div class="admin-status" id="qrStatus"></div>
+    </div>
+  </div>
+
   <div class="quick-sheet compact-panel" id="quickSheetPanel" style="display:none;">
     <div class="quick-sheet-top compact">
       <h2 class="compact-title">⚡ ສົ່ງຍອດ / ອອກບີນ / ກັອບປີ້</h2>
@@ -804,11 +844,13 @@
       <button class="mini-btn" id="toggleBillBtn" type="button" style="display:none;">🧾 ເບິ່ງໃບບີນ</button>
     </div>
     <div class="sheet-status compact" id="sheetStatus"></div>
+    <button type="button" class="mini-btn gold" id="pendingBillsBadge" style="display:none;margin-top:8px;"></button>
     <div id="billReceiptWrap" style="display:none;margin-top:10px;"></div>
   </div>
 
   <div class="admin-panel" id="adminPanel">
     <h2>ຈັດການຜູ້ໃຊ້ (Admin)</h2>
+    <div class="admin-status" id="firebaseStatus" style="margin-bottom:8px;"></div>
     <div id="adminGate">
       <div class="admin-row">
         <div class="field">
@@ -971,7 +1013,7 @@
           <div id="winSearchResults" style="margin-top:8px;"></div>
           <button type="button" class="btn compact" id="dailySummaryBtn" style="margin-top:8px;">📊 ຄິດໄລ່ + ບັນທຶກ ຍອດຮັບ-ສົ່ງ ທັງໝົດ (ທຸກບີນໃນວັນນີ້ ຈາກ Google Sheet)</button>
           <div class="admin-status" id="prizeSheetStatus"></div>
-          <div class="tbl-scroll" id="dailySummaryResultWrap" style="margin-top:8px;"></div>
+          <div id="dailySummaryResultWrap" style="margin-top:8px;overflow:visible;max-height:none;"></div>
         </div>
       </div>
 
@@ -1146,6 +1188,48 @@
   };
   var SHEETS_ENABLED = !!CONFIG.WEBAPP_URL && CONFIG.WEBAPP_URL.indexOf('PASTE_YOUR_') !== 0;
   var CONTROL_ENABLED = SHEETS_ENABLED && !!CONFIG.CONTROL_SHEET_URL;
+
+  // ---------- Firebase (ສຳຮອງຂໍ້ມູນ) ----------
+  // ໃຊ້ Firestore ເປັນບ່ອນສຳຮອງຂໍ້ມູນ "ຄຽງຄູ່" ກັບ Google Sheet ຫລັກ (ບໍ່ແທນທີ່) — ບີນ ແລະ ຍອດສະຫລຸບ
+  // ປະຈຳວັນຈະຖືກສຳເນົາໄປເກັບໄວ້ອີກຊຸດໜຶ່ງທີ່ນີ້ໂດຍອັດຕະໂນມັດ (ແບບບໍ່ລໍຖ້າ/ບໍ່ບລັອກໜ້າແອັບ) ເພື່ອກັນ
+  // ຂໍ້ມູນເສຍ ຖ້າ Google Sheet ມີບັນຫາ. ຖ້າ Firebase ໂຫລດ/ເຊື່ອມຕໍ່ບໍ່ໄດ້ (ບໍ່ມີເນັດ, CDN ຖືກບລັອກ ແລະ ອື່ນໆ)
+  // ແອັບຈະເຮັດວຽກປົກກະຕິຕໍ່ໄປຄືເກົ່າ (ບໍ່ຂຶ້ນກັບ Firebase, ມີແຕ່ Google Sheet ກໍ່ໃຊ້ໄດ້ຄືເດີມ).
+  var FIREBASE_CONFIG = {
+    apiKey: "AIzaSyCAyBZSUgyPNnxlUrXgQCQUIAuPQBW6MRw",
+    authDomain: "bkeasy-2b5c8.firebaseapp.com",
+    projectId: "bkeasy-2b5c8",
+    storageBucket: "bkeasy-2b5c8.firebasestorage.app",
+    messagingSenderId: "80869997862",
+    appId: "1:80869997862:web:aa95304b85d1a0ef5395e7",
+    measurementId: "G-2C97S2VJW3"
+  };
+  var FIREBASE_ENABLED = false;
+  var fbDb = null;
+  try{
+    if(window.firebase && firebase.initializeApp){
+      firebase.initializeApp(FIREBASE_CONFIG);
+      fbDb = firebase.firestore();
+      FIREBASE_ENABLED = true;
+    }
+  }catch(fbErr){ console.warn('Firebase init failed (ຈະຂ້າມການສຳຮອງ, ແອັບເຮັດວຽກຕໍ່ປົກກະຕິ):', fbErr); }
+  document.addEventListener('DOMContentLoaded', function(){
+    var fbStatusEl = document.getElementById('firebaseStatus');
+    if(fbStatusEl) fbStatusEl.textContent = FIREBASE_ENABLED
+      ? '🔥 Firebase: ເຊື່ອມຕໍ່ແລ້ວ — ບີນ+ຍອດສະຫລຸບຈະຖືກສຳຮອງໄວ້ອັດຕະໂນມັດ'
+      : '⚪ Firebase: ບໍ່ໄດ້ເຊື່ອມຕໍ່ (ຂ້າມການສຳຮອງ, Google Sheet ຍັງໃຊ້ໄດ້ປົກກະຕິ)';
+  });
+  // ສຳຮອງຂໍ້ມູນ 1 ຊຸດ (object) ເຂົ້າ collection ທີ່ລະບຸ — fire-and-forget, ບໍ່ throw ຖ້າລົ້ມເຫລວ
+  // (ບໍ່ໃຫ້ບັນຫາຝັ່ງ Firebase ໄປກະທົບການອອກບີນ/ບັນທຶກ Sheet ຫລັກ).
+  function backupToFirebase(collection, data){
+    if(!FIREBASE_ENABLED || !fbDb) return Promise.resolve({ ok:false, error:'Firebase ຍັງບໍ່ພ້ອມໃຊ້ງານ' });
+    var payload = Object.assign({}, data, { _savedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    return fbDb.collection(collection).add(payload)
+      .then(function(docRef){ return { ok:true, id: docRef.id }; })
+      .catch(function(err){
+        console.warn('Firebase backup ລົ້ມເຫລວ (' + collection + '):', err);
+        return { ok:false, error: err && err.message ? err.message : String(err) };
+      });
+  }
   var SESSION_KEY = 'laoLotteryCalcSession_v1';
   var USERS_KEY = 'laoLotteryUsersLocal_v1'; // cache ໄວ້ໃນເຄື່ອງ — ໃຊ້ຕອນອິນເຕີເນັດຂາດ, ແຫລ່ງຄວາມຈິງແມ່ນ Control Sheet
   var USERS_CACHE = null; // in-memory copy, refreshed from server whenever possible
@@ -1187,6 +1271,174 @@
         if(res && res.ok) setAdminPasswordCache(pw);
         return res;
       });
+  }
+
+  // ---------- QR ໂອນເງິນຕໍ່ຜູ້ໃຊ້ (ອັບໂຫລດເອງໄດ້, ບໍ່ຕ້ອງລໍ Admin) ----------
+  // ຄືກັນກັບລະຫັດ Admin: ຖ້າ CONTROL_ENABLED ຈະຊິ້ງຂ້າມອຸປະກອນຜ່ານ Google Sheet (ແທັບ Users ຄໍລຳ "qr"),
+  // ຖ້າບໍ່ ຈະເກັບໄວ້ໃນເຄື່ອງນີ້ຢ່າງດຽວ (keyed ຕໍ່ username ເພື່ອບໍ່ໃຫ້ QR ຄົນອື່ນປົນກັນ).
+  var QR_KEY_PREFIX = 'laoLotteryQr_v1_';
+  function getUserQrCached(username){
+    try{ return localStorage.getItem(QR_KEY_PREFIX + username) || ''; }catch(e){ return ''; }
+  }
+  function setUserQrCached(username, dataUrl){
+    try{
+      if(dataUrl) localStorage.setItem(QR_KEY_PREFIX + username, dataUrl);
+      else localStorage.removeItem(QR_KEY_PREFIX + username);
+      return true;
+    }catch(e){ return false; }
+  }
+  function fetchUserQr(username){
+    if(!CONTROL_ENABLED) return Promise.resolve(getUserQrCached(username));
+    return gsPost({ token: CONFIG.SHARED_TOKEN, action:'getUserQr', controlSheetUrl: CONFIG.CONTROL_SHEET_URL, username: username })
+      .then(function(res){
+        if(res && res.ok && res.qr){ setUserQrCached(username, res.qr); return res.qr; }
+        if(res && res.ok) setUserQrCached(username, ''); // ຢືນຢັນວ່າບໍ່ມີ QR ແທ້ (ບໍ່ແມ່ນ error) — ລ້າງ cache ເກົ່າອອກ
+        return getUserQrCached(username);
+      })
+      .catch(function(){ return getUserQrCached(username); });
+  }
+  function saveUserQr(username, dataUrl){
+    if(!CONTROL_ENABLED){
+      return Promise.resolve(setUserQrCached(username, dataUrl) ? { ok:true } : { ok:false, error:'ບັນທຶກໃນເຄື່ອງນີ້ບໍ່ໄດ້' });
+    }
+    return gsPost({ token: CONFIG.SHARED_TOKEN, action:'saveUserQr', controlSheetUrl: CONFIG.CONTROL_SHEET_URL, username: username, qr: dataUrl })
+      .then(function(res){
+        if(res && res.ok) setUserQrCached(username, dataUrl);
+        return res;
+      });
+  }
+  // ຫຍໍ້/ປັບຮູບ QR ກ່ອນອັບໂຫລດ — ໃຊ້ວິທີ "threshold ເປັນຂາວ-ດຳລ້ວນ + ບັນທຶກເປັນ PNG" ແທນ JPEG:
+  // QR ເປັນຮູບພາບ 2 ສີໂດຍທຳມະຊາດຢູ່ແລ້ວ, ການປັບແບບນີ້ (1) ລຶບ noise ຈາກການບີບອັດ JPEG ຕົ້ນສະບັບ
+  // ອອກ ເຮັດໃຫ້ຂອບຄົມຂຶ້ນ ສະແກນງ່າຍຂຶ້ນ (ບໍ່ແມ່ນຍາກຂຶ້ນ), ແລະ (2) ເຮັດໃຫ້ໄຟລ໌ນ້ອຍລົງຫລາຍສິບເທົ່າ (ຈາກ
+  // ຫລາຍສິບ-ຫລາຍຮ້ອຍ KB ເຫລືອພຽງ 5-10 KB) ຍ້ອນມີແຕ່ 2 ສີ PNG ອັດໄດ້ດີຫລາຍ — ຈຶ່ງເພີ່ມຄວາມລະອຽດໄດ້ສູງກວ່າ
+  // ເດີມຫລາຍ (ຄົມ, ພິມ/ຊູມໄດ້) ໂດຍຍັງບໍ່ເກີນຂອບເຂດ Google Sheets (~50,000 ໂຕອັກສອນ/ຫ້ອງ)
+  function resizeImageFile(file, maxSize, threshold){
+    return new Promise(function(resolve, reject){
+      var reader = new FileReader();
+      reader.onload = function(e){
+        var img = new Image();
+        img.onload = function(){
+          var w = img.width, h = img.height;
+          var scale = Math.min(1, maxSize / Math.max(w, h));
+          var cw = Math.max(1, Math.round(w * scale));
+          var ch = Math.max(1, Math.round(h * scale));
+          var canvas = document.createElement('canvas');
+          canvas.width = cw; canvas.height = ch;
+          var ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, cw, ch); // ພື້ນຂາວ ກັນຮູບພື້ນໂປ່ງໃສ (PNG) ກາຍເປັນສີດຳ
+          ctx.drawImage(img, 0, 0, cw, ch);
+          if(threshold !== null){
+            try{
+              var imgData = ctx.getImageData(0, 0, cw, ch);
+              var d = imgData.data;
+              for(var i=0; i<d.length; i+=4){
+                var lum = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
+                var v = lum > threshold ? 255 : 0;
+                d[i] = v; d[i+1] = v; d[i+2] = v; d[i+3] = 255;
+              }
+              ctx.putImageData(imgData, 0, 0);
+            }catch(pixErr){ /* ຖ້າກວດ pixel ບໍ່ໄດ້ (cross-origin ແປກໆ) ໃຫ້ໃຊ້ຮູບເດີມທີ່ຍັງບໍ່ threshold ຕໍ່ໄປ */ }
+          }
+          try{ resolve(canvas.toDataURL(threshold !== null ? 'image/png' : 'image/jpeg', 0.7)); }
+          catch(err){ reject(err); }
+        };
+        img.onerror = function(){ reject(new Error('ອ່ານຮູບບໍ່ໄດ້')); };
+        img.src = e.target.result;
+      };
+      reader.onerror = function(){ reject(new Error('ອ່ານໄຟລ໌ບໍ່ໄດ້')); };
+      reader.readAsDataURL(file);
+    });
+  }
+  // ລອງຫລາຍຄວາມລະອຽດຈາກສູງສຸດລົງ (900→700→500→350→250px, ຂາວ-ດຳ+PNG) ຈົນກວ່າຈະພໍດີກັບຂອບເຂດ
+  // ຫ້ອງ Google Sheets — ໃຫ້ໄດ້ຮູບຄົມ/ໃຫຍ່ທີ່ສຸດເທົ່າທີ່ພໍໄດ້ໂດຍອັດຕະໂນມັດ ບໍ່ຕ້ອງໃຫ້ຜູ້ໃຊ້ຄາດເດົາຂະໜາດເອງ.
+  // ຖ້າຮູບຕົ້ນສະບັບບໍ່ແມ່ນ QR ຂາວ-ດຳ (ເຊັ່ນ ຮູບຄົນ/ໂລໂກສີ) ຈົນ threshold+PNG ຍັງນ້ອຍພໍບໍ່ໄດ້ — fallback ໄປໃຊ້
+  // ຮູບສີເດີມ (ບໍ່ threshold) ບີບອັດແບບ JPEG ແທນ ເພື່ອບໍ່ໃຫ້ຮູບຖືກບັງຄັບເປັນຂາວ-ດຳຜິດປະເພດ.
+  function processQrImageAdaptive(file){
+    var sizes = [900, 700, 500, 350, 250];
+    var threshold = 140;
+    var LIMIT = 44000;
+    var i = 0;
+    function tryNext(){
+      if(i >= sizes.length) return resizeImageFile(file, 500, null); // fallback: JPEG ສີເດີມ ບໍ່ threshold
+      var size = sizes[i];
+      i++;
+      return resizeImageFile(file, size, threshold).then(function(dataUrl){
+        if(dataUrl.length <= LIMIT) return dataUrl;
+        return tryNext();
+      });
+    }
+    return tryNext();
+  }
+  function initQrBox(){
+    var fileInput = document.getElementById('qrFileInput');
+    var previewWrap = document.getElementById('qrPreviewWrap');
+    var saveBtn = document.getElementById('qrSaveBtn');
+    var removeBtn = document.getElementById('qrRemoveBtn');
+    var status = document.getElementById('qrStatus');
+    var toggleBtn = document.getElementById('qrToggleBtn');
+    var boxBody = document.getElementById('qrBoxBody');
+    var headThumb = document.getElementById('qrHeadThumb');
+    var pendingDataUrl = null;
+
+    function renderPreview(dataUrl){
+      if(previewWrap) previewWrap.innerHTML = dataUrl ? '<img src="' + dataUrl + '" alt="QR">' : '<div class="empty-note">ຍັງບໍ່ມີ QR — ເລືອກຮູບຂ້າງເທິງ</div>';
+      if(headThumb) headThumb.innerHTML = dataUrl ? '<img src="' + dataUrl + '" alt="QR">' : '';
+    }
+    function setExpanded(expanded){
+      if(boxBody) boxBody.style.display = expanded ? '' : 'none';
+      if(toggleBtn) toggleBtn.textContent = expanded ? '▲ ເຊື່ອງ' : '▼ ສະແດງ';
+    }
+    // ເປີດເຜີຍໃຫ້ renderUserBar ຮຽກໃຊ້ໄດ້ຕອນ login/ປ່ຽນຜູ້ໃຊ້
+    window._qrRenderPreview = renderPreview;
+
+    if(toggleBtn) toggleBtn.addEventListener('click', function(){
+      var isExpanded = boxBody && boxBody.style.display !== 'none';
+      setExpanded(!isExpanded);
+    });
+    setExpanded(false); // ເລີ່ມຕົ້ນແບບເຊື່ອງ (ຫຍໍ້) — ກົດ "ສະແດງ" ເພື່ອອັບໂຫລດ/ປ່ຽນ QR
+
+    if(fileInput) fileInput.addEventListener('change', function(){
+      var file = fileInput.files && fileInput.files[0];
+      if(!file) return;
+      if(status) status.textContent = 'ກຳລັງປັບແຕ່ງຮູບ QR...';
+      processQrImageAdaptive(file).then(function(dataUrl){
+        pendingDataUrl = dataUrl;
+        renderPreview(dataUrl);
+        var kb = Math.round(dataUrl.length * 0.75 / 1024);
+        if(status) status.textContent = 'ຮູບພ້ອມແລ້ວ (~' + kb + ' KB) — ກົດ "ບັນທຶກ QR" ເພື່ອບັນທຶກ';
+      }).catch(function(){
+        if(status) status.textContent = '❌ ອ່ານຮູບບໍ່ໄດ້, ລອງເລືອກຮູບອື່ນ';
+      });
+    });
+
+    if(saveBtn) saveBtn.addEventListener('click', function(){
+      if(!currentUser){ if(status) status.textContent = 'ກະລຸນາເຂົ້າສູ່ລະບົບກ່ອນ'; return; }
+      if(!pendingDataUrl){ if(status) status.textContent = 'ກະລຸນາເລືອກຮູບ QR ກ່ອນ'; return; }
+      saveBtn.disabled = true;
+      if(status) status.textContent = 'ກຳລັງບັນທຶກ...';
+      saveUserQr(currentUser.username, pendingDataUrl).then(function(res){
+        saveBtn.disabled = false;
+        if(res && res.ok){
+          if(status) status.textContent = '✅ ບັນທຶກ QR ສຳເລັດ — ຈະສະແດງຢູ່ໃນໃບບີນຕໍ່ໄປ';
+          setExpanded(false); // ອັບໂຫລດສຳເລັດແລ້ວ ເຊື່ອງແຖບລົງອັດຕະໂນມັດ
+        } else if(status){
+          status.textContent = '❌ ' + (res && res.error ? res.error : 'ບໍ່ຮູ້ສາເຫດ');
+        }
+      });
+    });
+
+    if(removeBtn) removeBtn.addEventListener('click', function(){
+      if(!currentUser){ if(status) status.textContent = 'ກະລຸນາເຂົ້າສູ່ລະບົບກ່ອນ'; return; }
+      removeBtn.disabled = true;
+      if(status) status.textContent = 'ກຳລັງລຶບ...';
+      saveUserQr(currentUser.username, '').then(function(res){
+        removeBtn.disabled = false;
+        pendingDataUrl = null;
+        renderPreview('');
+        if(fileInput) fileInput.value = '';
+        if(status) status.textContent = (res && res.ok) ? '✅ ລຶບ QR ແລ້ວ' : ('❌ ' + (res && res.error ? res.error : 'ບໍ່ຮູ້ສາເຫດ'));
+      });
+    });
   }
 
   // ---------- ລາຍເຊັນ/ໂລໂກຂໍ້ຄວາມ (watermark) ----------
@@ -1329,8 +1581,15 @@
     var bar = document.getElementById('userBar');
     var quickPanel = document.getElementById('quickSheetPanel');
     var destUsername = document.getElementById('destUsername');
+    var qrBox = document.getElementById('qrBox');
     if(destUsername) destUsername.textContent = user ? user.username : '—';
     if(quickPanel) quickPanel.style.display = (SHEETS_ENABLED && user && user.sheetUrl) ? '' : 'none';
+    if(qrBox) qrBox.style.display = user ? '' : 'none';
+    if(user){
+      fetchUserQr(user.username).then(function(dataUrl){
+        if(window._qrRenderPreview) window._qrRenderPreview(dataUrl);
+      });
+    }
     if(!bar) return;
     if(!user){ bar.innerHTML = ''; return; }
     bar.innerHTML =
@@ -1827,6 +2086,11 @@
           if(!res.ok){ status.textContent = '❌ ' + res.error; renderDailySummaryResult(null); return; }
           status.textContent = '✅ ຄິດໄລ່ ແລະ ບັນທຶກຍອດຮັບ-ສົ່ງລົງແທັບ "Summary" ໃນ Google Sheet ແລ້ວ (' + res.billCount + ' ບີນ)';
           renderDailySummaryResult(res);
+          backupToFirebase('daily_summary', {
+            username: currentUser ? currentUser.username : 'guest', dateStr: res.dateStr, currency: res.currency,
+            billCount: res.billCount, totalAll: res.totalAll, totalReceive: res.totalReceive,
+            totalSendBeforeWin: res.totalSendBeforeWin, totalWinAmount: res.totalWinAmount, totalSendNet: res.totalSendNet
+          });
         });
       });
     }
@@ -1849,6 +2113,24 @@
       if(panel) panel.style.display = 'none';
       return;
     }
+
+    // ປຸ່ມ "ຊິ້ງບີນຄ້າງ" — ສະແດງເມື່ອມີບີນທີ່ອອກໄປແລ້ວແຕ່ຍັງບໍ່ໄດ້ຊິ້ງເຂົ້າ Google Sheet (ຍ້ອນເນັດຂາດ/error
+    // ຕອນອອກບີນ) — ກົດເພື່ອລອງສົ່ງເຂົ້າ Sheet ຄືນ, ຫລືລອງອັດຕະໂນມັດຕອນເປີດແອັບ ແລະ ທຸກໆ 30 ວິນາທີ
+    updatePendingBillsBadge();
+    var pendingBtn = document.getElementById('pendingBillsBadge');
+    if(pendingBtn) pendingBtn.addEventListener('click', function(){
+      pendingBtn.disabled = true;
+      pendingBtn.textContent = 'ກຳລັງຊິ້ງ...';
+      retryPendingBills().then(function(res){
+        pendingBtn.disabled = false;
+        updatePendingBillsBadge();
+        if(status) status.textContent = res.ok
+          ? ('✅ ຊິ້ງບີນຄ້າງສຳເລັດ ' + res.synced + ' ໃບ' + (res.remaining > 0 ? (', ຍັງຄ້າງ ' + res.remaining + ' ໃບ') : ''))
+          : ('❌ ' + res.error);
+      });
+    });
+    setTimeout(function(){ retryPendingBills().then(updatePendingBillsBadge); }, 3000); // ລອງອັດຕະໂນມັດຄັ້ງໜຶ່ງຫລັງເປີດແອັບ
+    setInterval(function(){ retryPendingBills().then(updatePendingBillsBadge); }, 30000); // ແລ້ວລອງອີກທຸກ 30 ວິນາທີ
 
     var toggleBtn = document.getElementById('toggleBillBtn');
     var saveImgBtn = document.getElementById('saveBillImgBtn');
@@ -1926,8 +2208,9 @@
         status.textContent = 'ກຳລັງອອກບີນ...';
         issueBillNow().then(function(res){
           billBtn.disabled = false;
-          status.textContent = res.ok ? ('✅ ອອກບີນ #' + res.billNo + ' ແລ້ວ') : ('❌ ' + res.error);
-          if(res.ok) showBillControls();
+          if(!res.ok){ status.textContent = '❌ ' + res.error; return; }
+          status.textContent = res.warning ? res.warning : ('✅ ອອກບີນ #' + res.billNo + ' ແລ້ວ');
+          showBillControls();
         });
       });
     }
@@ -2038,6 +2321,8 @@
     } else {
       totalHtml = '<div class="bill-total"><span>ລວມລາຄາທັງໝົດ</span><b class="mono">' + KIP(bill.totalAll) + ' ກີບ</b></div>';
     }
+    var qrDataUrl = bill.username ? getUserQrCached(bill.username) : '';
+    var qrHtml = qrDataUrl ? ('<div class="bill-qr"><img src="' + qrDataUrl + '" alt="QR ໂອນເງິນ"><div style="font-size:12px;opacity:.75;margin-top:4px;">📱 ສະແກນ QR ເພື່ອໂອນເງິນ</div></div>') : '';
     wrap.innerHTML =
       '<div class="bill-ticket">' +
         (brand ? '<div class="bill-brand">' + escapeHtml(brand) + '</div>' : '') +
@@ -2048,6 +2333,7 @@
         '</div>' +
         '<div class="bill-grid bill-grid-1col">' + cellsHtml + '</div>' +
         totalHtml +
+        qrHtml +
         (brand ? '<div class="bill-brand" style="opacity:.6;font-size:12px;">' + escapeHtml(brand) + '</div>' : '') +
       '</div>';
   }
@@ -2056,6 +2342,49 @@
   // ບໍ່ວ່າຈະສົ່ງເຂົ້າ Sheet ໄດ້ຫຼືບໍ່ (ອອກບີນທ້ອງຖິ່ນສະເໝີເປັນທາງເລືອກສຳຮອງ) — ໃຫ້ combo action ຂ້າງລຸ່ມນຳໄປໃຊ້ຮ່ວມກັບການສົ່ງຍອດ ແລະ ກັອບປີ້.
   // ຖ້າມີທັງເດີມພັນ "ກີບ" ແລະ "ບາດ" ປົນກັນຢູ່ໃນຊຸດດຽວກັນ — ຈະແຍກສົ່ງເປັນ 2 ບີນ ຄົນລະຊິດ (Bills / Bills_THB)
   // ໃນ Google Sheet ໂດຍອັດຕະໂນມັດ (ໃບບີນທີ່ສະແດງໃນແອັບຍັງລວມສະແດງທັງໝົດຢູ່ໃນທີ່ດຽວ, ພຽງແຕ່ຂໍ້ມູນຫລັງບ້ານແຍກຊິດ).
+  // ---------- ບີນທີ່ຄ້າງ ຍັງບໍ່ໄດ້ຊິ້ງເຂົ້າ Google Sheet (ຍ້ອນເນັດຂາດ/Apps Script ບໍ່ຕອບ ຕອນອອກບີນ) ----------
+  // ອອກບີນທ້ອງຖິ່ນໃຫ້ລູກຄ້າກ່ອນສະເໝີ (ບໍ່ໃຫ້ຢຸດການຂາຍ), ແຕ່ຄ້າງລາຍການໄວ້ໃນເຄື່ອງນີ້ເພື່ອຊິ້ງເຂົ້າ Sheet
+  // ຄືນພາຍຫລັງອັດຕະໂນມັດ (ຫລືກົດ "ຊິ້ງບີນຄ້າງ" ເອງ) — ຮັບປະກັນວ່າສຸດທ້າຍບີນທຸກໃບຈະລົງ Sheet ຄົບ.
+  var PENDING_BILLS_KEY = 'laoLotteryPendingBills_v1';
+  function getPendingBills(){
+    try{ return JSON.parse(localStorage.getItem(PENDING_BILLS_KEY) || '[]'); }catch(e){ return []; }
+  }
+  function setPendingBills(arr){
+    try{ localStorage.setItem(PENDING_BILLS_KEY, JSON.stringify(arr)); }catch(e){}
+  }
+  function queuePendingBill(payload){
+    var arr = getPendingBills();
+    arr.push(payload);
+    setPendingBills(arr);
+    updatePendingBillsBadge();
+  }
+  function updatePendingBillsBadge(){
+    var el = document.getElementById('pendingBillsBadge');
+    if(!el) return;
+    var n = getPendingBills().length;
+    el.textContent = n > 0 ? ('🔄 ຊິ້ງບີນຄ້າງ (' + n + ')') : '';
+    el.style.display = n > 0 ? '' : 'none';
+  }
+  // ພະຍາຍາມສົ່ງບີນທີ່ຄ້າງທັງໝົດເຂົ້າ Sheet ຄືນ — ໃບໃດສຳເລັດ ຈະຖືກເອົາອອກຈາກຄິວ, ໃບໃດຍັງລົ້ມເຫລວ ຄ້າງໄວ້ຄືເກົ່າ
+  function retryPendingBills(){
+    var arr = getPendingBills();
+    if(arr.length === 0) return Promise.resolve({ ok:true, synced:0, remaining:0 });
+    if(!currentUser || !currentUser.sheetUrl || !/\/exec$/.test((CONFIG.WEBAPP_URL||'').trim())){
+      return Promise.resolve({ ok:false, error:'ຍັງເຊື່ອມຕໍ່ Google Sheet ບໍ່ໄດ້' });
+    }
+    return Promise.all(arr.map(function(p){
+      return gsPost({ action:'issueBill', token: CONFIG.SHARED_TOKEN, sheetUrl: currentUser.sheetUrl, billTab: p.billTab,
+        dateStr: p.dateStr, timeStr: p.timeStr, username: p.username, totalAll: p.totalAll, lineGroups: p.lineGroups })
+        .then(function(res){ return { p: p, ok: !!(res && res.ok) }; })
+        .catch(function(){ return { p: p, ok: false }; });
+    })).then(function(results){
+      var stillPending = results.filter(function(r){ return !r.ok; }).map(function(r){ return r.p; });
+      setPendingBills(stillPending);
+      updatePendingBillsBadge();
+      return { ok:true, synced: results.length - stillPending.length, remaining: stillPending.length };
+    });
+  }
+
   function issueBillNow(){
     if(!lastRows || lastRows.length === 0 || !lastTotalAll || lastTotalAll <= 0){
       return Promise.resolve({ ok:false, error:'ຍັງບໍ່ມີຍອດ — ພິມຊຸດເລກ ແລະ ກົດ "ຄິດໄລ່ຍອດ" ກ່ອນອອກບີນ' });
@@ -2079,6 +2408,11 @@
       var billNoLocal = nextLocalBillNo(dateStr);
       var billLocal = { billNo: billNoLocal, dateLabel: dateLabel, timeStr: timeStr, username: username, groups: groups, totalAll: lastTotalAll };
       renderBillReceipt(billLocal);
+      backupToFirebase('bills', {
+        billNo: billNoLocal, username: username, dateStr: dateStr, timeStr: timeStr, totalAll: lastTotalAll,
+        groups: groups.map(function(g){ return { raw: g.raw, total: g.total, currency: g.currency }; }),
+        sentToSheet: false
+      });
       return Promise.resolve({
         ok:true, billNo: billNoLocal, sentToSheet: false,
         note: currentUser && currentUser.sheetUrl
@@ -2101,17 +2435,53 @@
       postGroups(thbGroups, 'Bills_THB', thbTotal)
     ]).then(function(results){
       var lakRes = results[0], thbRes = results[1];
-      if(lakGroups.length > 0 && (!lakRes || !lakRes.ok)) return { ok:false, error: (lakRes && lakRes.error) ? lakRes.error : 'ສົ່ງບີນ (ກີບ) ບໍ່ສຳເລັດ' };
-      if(thbGroups.length > 0 && (!thbRes || !thbRes.ok)) return { ok:false, error: (thbRes && thbRes.error) ? thbRes.error : 'ສົ່ງບີນ (ບາດ) ບໍ່ສຳເລັດ' };
+      var lakFailed = lakGroups.length > 0 && (!lakRes || !lakRes.ok);
+      var thbFailed = thbGroups.length > 0 && (!thbRes || !thbRes.ok);
+      if(lakFailed || thbFailed){
+        // ສົ່ງເຂົ້າ Google Sheet ບໍ່ສຳເລັດ (ເນັດຂາດ, Apps Script ບໍ່ຕອບ, ແລະ ອື່ນໆ) — ແທນທີ່ຈະຢຸດການອອກບີນ
+        // ໝົດເລີຍ (ຄືເກົ່າ), ໃຫ້ອອກບີນທ້ອງຖິ່ນໃຫ້ລູກຄ້າກ່ອນ (ນັບເລກທີ່ບີນຢູ່ອຸປະກອນນີ້) ແລ້ວແຈ້ງເຕືອນວ່າ
+        // ຍັງບໍ່ໄດ້ຊິ້ງເຂົ້າ Sheet — ເພື່ອບໍ່ໃຫ້ບັນຫາເຄືອຂ່າຍມາຂັດຂວາງການອອກບີນຂາຍເລກຕົວຈິງ.
+        var billNoFallback = nextLocalBillNo(dateStr);
+        var billFallback = { billNo: billNoFallback, dateLabel: dateLabel, timeStr: timeStr, username: username, groups: groups, totalAll: lastTotalAll };
+        renderBillReceipt(billFallback);
+        if(lakFailed) queuePendingBill({ billTab:'Bills', dateStr:dateStr, timeStr:timeStr, username:username, totalAll:lakTotal, lineGroups: lakGroups.map(function(g){ return { lineNo:g.lineNo, items:g.items }; }) });
+        if(thbFailed) queuePendingBill({ billTab:'Bills_THB', dateStr:dateStr, timeStr:timeStr, username:username, totalAll:thbTotal, lineGroups: thbGroups.map(function(g){ return { lineNo:g.lineNo, items:g.items }; }) });
+        backupToFirebase('bills', {
+          billNo: billNoFallback, username: username, dateStr: dateStr, timeStr: timeStr, totalAll: lastTotalAll,
+          groups: groups.map(function(g){ return { raw: g.raw, total: g.total, currency: g.currency }; }),
+          sentToSheet: false
+        });
+        var errMsg = (lakFailed && lakRes && lakRes.error) ? lakRes.error : ((thbFailed && thbRes && thbRes.error) ? thbRes.error : 'ເຊື່ອມຕໍ່ Google Sheet ບໍ່ໄດ້');
+        return {
+          ok:true, billNo: billNoFallback, sentToSheet: false,
+          note: 'ອອກບີນ #' + billNoFallback + ' (ນັບຢູ່ອຸປະກອນນີ້ — ຄ້າງໄວ້ຊິ້ງເຂົ້າ Google Sheet ອັດຕະໂນມັດພາຍຫລັງ)',
+          warning: '⚠️ ບີນນີ້ອອກໃຫ້ແລ້ວ ແຕ່ຍັງບໍ່ໄດ້ຊິ້ງເຂົ້າ Google Sheet (ຄ້າງໄວ້ໃນຄິວແລ້ວ, ຈະລອງໃໝ່ໃຫ້ອັດຕະໂນມັດ): ' + errMsg
+        };
+      }
       var billNoShown = lakRes ? lakRes.billNo : (thbRes ? thbRes.billNo : null);
       var bill = { billNo: billNoShown, dateLabel: dateLabel, timeStr: timeStr, username: username, groups: groups, totalAll: lastTotalAll };
       renderBillReceipt(bill);
+      backupToFirebase('bills', {
+        billNo: billNoShown, username: username, dateStr: dateStr, timeStr: timeStr, totalAll: lastTotalAll,
+        groups: groups.map(function(g){ return { raw: g.raw, total: g.total, currency: g.currency }; }),
+        sentToSheet: true
+      });
       var noteParts = [];
       if(lakRes) noteParts.push('ກີບ #' + lakRes.billNo);
       if(thbRes) noteParts.push('ບາດ #' + thbRes.billNo);
       return { ok:true, billNo: billNoShown, sentToSheet: true, note: 'ອອກບີນ ' + noteParts.join(' + ') };
     }).catch(function(err){
-      return { ok:false, error: err && err.message ? err.message : String(err) };
+      // Promise.all ຕົວມັນເອງ throw (ເຊັ່ນ network error ຮ້າຍແຮງ) — ຍັງອອກບີນທ້ອງຖິ່ນໃຫ້ກ່ອນ ບໍ່ໃຫ້ຄ້າງເປົ່າໆ
+      var billNoErr = nextLocalBillNo(dateStr);
+      var billErr = { billNo: billNoErr, dateLabel: dateLabel, timeStr: timeStr, username: username, groups: groups, totalAll: lastTotalAll };
+      renderBillReceipt(billErr);
+      if(lakGroups.length > 0) queuePendingBill({ billTab:'Bills', dateStr:dateStr, timeStr:timeStr, username:username, totalAll:lakTotal, lineGroups: lakGroups.map(function(g){ return { lineNo:g.lineNo, items:g.items }; }) });
+      if(thbGroups.length > 0) queuePendingBill({ billTab:'Bills_THB', dateStr:dateStr, timeStr:timeStr, username:username, totalAll:thbTotal, lineGroups: thbGroups.map(function(g){ return { lineNo:g.lineNo, items:g.items }; }) });
+      return {
+        ok:true, billNo: billNoErr, sentToSheet: false,
+        note: 'ອອກບີນ #' + billNoErr + ' (ນັບຢູ່ອຸປະກອນນີ້ — ຄ້າງໄວ້ຊິ້ງເຂົ້າ Google Sheet ອັດຕະໂນມັດພາຍຫລັງ)',
+        warning: '⚠️ ບີນນີ້ອອກໃຫ້ແລ້ວ ແຕ່ຍັງບໍ່ໄດ້ຊິ້ງເຂົ້າ Google Sheet (ຄ້າງໄວ້ໃນຄິວແລ້ວ): ' + (err && err.message ? err.message : String(err))
+      };
     });
   }
 
@@ -2628,9 +2998,11 @@
       }
       var pct = parseFloat(pctInput.value);
       if(isNaN(pct)) pct = 0;
-      var totalReceive = totalAll * (pct/100);
+      // ປັດເສດຄ່າຄອມ/ຍອດສົ່ງເປັນຫລັກພັນ (ເສດ >=500 ປັດຂຶ້ນ 1,000 / ຕ່ຳກວ່າ 500 ປັດລົງ 0) ຄືກັນກັບຍອດຈ່າຍລາງວັນ
+      // ຍ້ອນ % ຄອມອາດຄິດໄລ່ອອກມາເປັນເລກບໍ່ກົມ (ເຊັ່ນ 8% ຂອງ 12,750,000 = 1,020,000 ແຕ່ຖ້າ 8.3% ອາດໄດ້ເລກແປກໆ)
+      var totalReceive = roundToNearestThousand(totalAll * (pct/100));
       var totalSend = totalAll - totalReceive;
-      var totalReceiveThb = totalAllThb * (pct/100);
+      var totalReceiveThb = roundToNearestThousand(totalAllThb * (pct/100));
       var totalSendThb = totalAllThb - totalReceiveThb;
       lastTotalAll = totalAll + totalAllThb; // ໃຊ້ເປັນຕົວກວດ ">0" ກ່ອນອອກບີນ (ອອກບີນຈິງແຍກຄິດຄືນຕາມສະກຸນເງິນ)
 
@@ -2939,6 +3311,8 @@
     '    if(body.action === "saveBoard") return json_(setUserBoard_(body));',
     '    if(body.action === "getUsers") return json_(getUsers_(body));',
     '    if(body.action === "saveUsers") return json_(saveUsers_(body));',
+    '    if(body.action === "getUserQr") return json_(getUserQr_(body));',
+    '    if(body.action === "saveUserQr") return json_(saveUserQr_(body));',
     '    if(body.action === "getAdminPassword") return json_(getAdminPassword_(body));',
     '    if(body.action === "setAdminPassword") return json_(setAdminPassword_(body));',
     '    if(body.action === "getBrandText") return json_(getBrandText_(body));',
@@ -3274,7 +3648,7 @@
     '    var win2Amount = roundTo1000_(win2Stake * r2);',
     '    var win3Amount = roundTo1000_(win3Stake * r3);',
     '    var win2BottomAmount = roundTo1000_(win2BottomStake * r2b);',
-    '    var totalReceive = totalAll * (pct/100);',
+    '    var totalReceive = roundTo1000_(totalAll * (pct/100));',
     '    var totalSendBeforeWin = totalAll - totalReceive;',
     '    var totalWinAmount = win2Amount + win3Amount + win2BottomAmount;',
     '    var totalSendNet = totalSendBeforeWin - totalWinAmount;',
@@ -3403,17 +3777,71 @@
     'function saveUsers_(body){',
     '  try{',
     '    if(!body.controlSheetUrl) return { ok:false, error:"ບໍ່ພົບ Control Sheet URL" };',
-    '    var sh = getControlSheet_(body.controlSheetUrl, "Users", ["username","expiry","sheetUrl"]);',
+    '    var sh = getControlSheet_(body.controlSheetUrl, "Users", ["username","expiry","sheetUrl","qr"]);',
     '    var users = body.users || [];',
     '    var lastRow = sh.getLastRow();',
-    '    if(lastRow > 1) sh.getRange(2,1,lastRow-1,3).clearContent();',
+    '    // ອ່ານ QR ເກົ່າໄວ້ກ່ອນ (keyed ດ້ວຍ username) ເພື່ອບໍ່ໃຫ້ QR ຂອງຜູ້ໃຊ້ຫາຍ/ສະຫລັບກັນເມື່ອ Admin',
+    '    // ແກ້ໄຂ/ລຶບ/ລຽງລຳດັບຜູ້ໃຊ້ໃໝ່ (ຖ້າອີງໃສ່ຕຳແໜ່ງແຖວຢ່າງດຽວ ຈະສະຫລັບ QR ຄົນຜິດໄດ້ງ່າຍໆ)',
+    '    var oldQrMap = {};',
+    '    if(lastRow > 1){',
+    '      var oldData = sh.getRange(2,1,lastRow-1,4).getValues();',
+    '      oldData.forEach(function(r){ if(r[0]) oldQrMap[String(r[0])] = r[3] || ""; });',
+    '      sh.getRange(2,1,lastRow-1,4).clearContent();',
+    '    }',
     '    if(users.length > 0){',
-    '      var rows = users.map(function(u){ return [u.username||"", u.expiry||"", u.sheetUrl||""]; });',
-    '      sh.getRange(2,1,rows.length,3).setValues(rows);',
+    '      var rows = users.map(function(u){',
+    '        var uname = u.username || "";',
+    '        return [uname, u.expiry||"", u.sheetUrl||"", oldQrMap[uname] || ""];',
+    '      });',
+    '      sh.getRange(2,1,rows.length,4).setValues(rows);',
     '    }',
     '    return { ok:true, count: users.length };',
     '  }catch(err){',
     '    return { ok:false, error:"ບັນທຶກລາຍຊື່ຜູ້ໃຊ້ບໍ່ສຳເລັດ: " + String(err && err.message ? err.message : err) };',
+    '  }',
+    '}',
+    '',
+    '// ================= QR ໂອນເງິນຕໍ່ຜູ້ໃຊ້ (ອັບໂຫລດເອງໄດ້) =================',
+    '// ເກັບເປັນ base64 data URL ຢູ່ຄໍລຳ "qr" (D) ຂອງແທັບ Users, ຄົ້ນຫາ/ຂຽນແບບ "match ດ້ວຍ username"',
+    '// (ບໍ່ອີງໃສ່ຕຳແໜ່ງແຖວ) ເພື່ອໃຫ້ປອດໄພຕໍ່ການແກ້ໄຂ/ລຽງລຳດັບຜູ້ໃຊ້ຈາກ Admin ໃນພາຍຫລັງ.',
+    'function getUserQr_(body){',
+    '  try{',
+    '    if(!body.controlSheetUrl) return { ok:false, error:"ບໍ່ພົບ Control Sheet URL" };',
+    '    var username = String(body.username || "").trim();',
+    '    if(!username) return { ok:false, error:"ບໍ່ມີຊື່ຜູ້ໃຊ້" };',
+    '    var sh = getControlSheet_(body.controlSheetUrl, "Users", ["username","expiry","sheetUrl","qr"]);',
+    '    var lastRow = sh.getLastRow();',
+    '    if(lastRow < 2) return { ok:true, qr:"" };',
+    '    var data = sh.getRange(2,1,lastRow-1,4).getValues();',
+    '    for(var i=0;i<data.length;i++){',
+    '      if(String(data[i][0]) === username) return { ok:true, qr: String(data[i][3] || "") };',
+    '    }',
+    '    return { ok:true, qr:"" };',
+    '  }catch(err){',
+    '    return { ok:false, error:"ດຶງ QR ບໍ່ສຳເລັດ: " + String(err && err.message ? err.message : err) };',
+    '  }',
+    '}',
+    '',
+    'function saveUserQr_(body){',
+    '  try{',
+    '    if(!body.controlSheetUrl) return { ok:false, error:"ບໍ່ພົບ Control Sheet URL" };',
+    '    var username = String(body.username || "").trim();',
+    '    if(!username) return { ok:false, error:"ບໍ່ມີຊື່ຜູ້ໃຊ້" };',
+    '    var qr = String(body.qr || "");',
+    '    if(qr.length > 45000) return { ok:false, error:"ຮູບ QR ໃຫຍ່ເກີນໄປ ບັນທຶກລົງ Google Sheet ບໍ່ໄດ້ — ລອງເລືອກຮູບໃໝ່ (ແອັບຫຍໍ້ຮູບໃຫ້ອັດຕະໂນມັດແລ້ວ, ອາດເປັນຮູບຕົ້ນສະບັບລະອຽດເກີນໄປ)" };',
+    '    var sh = getControlSheet_(body.controlSheetUrl, "Users", ["username","expiry","sheetUrl","qr"]);',
+    '    var lastRow = sh.getLastRow();',
+    '    if(lastRow < 2) return { ok:false, error:"ບໍ່ພົບຜູ້ໃຊ້ " + username + " ໃນລະບົບ (ຕ້ອງເປັນຜູ້ໃຊ້ທີ່ Admin ສ້າງໄວ້ແລ້ວ)" };',
+    '    var usernames = sh.getRange(2,1,lastRow-1,1).getValues();',
+    '    var rowIdx = -1;',
+    '    for(var i=0;i<usernames.length;i++){',
+    '      if(String(usernames[i][0]) === username){ rowIdx = i + 2; break; }',
+    '    }',
+    '    if(rowIdx < 0) return { ok:false, error:"ບໍ່ພົບຜູ້ໃຊ້ " + username + " ໃນລະບົບ (ຕ້ອງເປັນຜູ້ໃຊ້ທີ່ Admin ສ້າງໄວ້ແລ້ວ)" };',
+    '    sh.getRange(rowIdx, 4).setValue(qr);',
+    '    return { ok:true };',
+    '  }catch(err){',
+    '    return { ok:false, error:"ບັນທຶກ QR ບໍ່ສຳເລັດ: " + String(err && err.message ? err.message : err) };',
     '  }',
     '}',
     '',
@@ -4146,6 +4574,7 @@
     initAdminPanel();
     initSheetPanel();
     initWinResultSheetSync();
+    initQrBox();
     if(CONTROL_ENABLED) refreshBrandText();
     initGuideModal();
     initCopySummary();
