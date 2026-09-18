@@ -275,6 +275,28 @@
   .stub-line.take .val{color:#7fd6a3;}
   .stub-line.banned .val{color:var(--red-bright);}
 
+  /* ---- ແຖບຍອດຮັບ-ສົ່ງຕິດໜ້າຈໍ (ສະເພາະໂທລະສັບ) — ໃຫ້ເຫັນຍອດຫລ້າສຸດຕະຫລອດ ບໍ່ຕ້ອງເລື່ອນຫາໃບສະຫລຸບ ---- */
+  #mobileSummaryBar{
+    display:none;
+    position:fixed;
+    left:0;right:0;bottom:0;
+    z-index:60;
+    background:var(--panel-alt);
+    border-top:1px solid var(--gold);
+    padding:8px 14px calc(8px + env(safe-area-inset-bottom,0px));
+    box-shadow:0 -6px 16px rgba(0,0,0,.4);
+  }
+  #mobileSummaryBar .msb-row{display:flex;justify-content:space-between;gap:8px;}
+  #mobileSummaryBar .msb-item{flex:1;text-align:center;min-width:0;}
+  #mobileSummaryBar .msb-lbl{display:block;font-size:10px;color:var(--cream-dim);white-space:nowrap;}
+  #mobileSummaryBar .msb-val{display:block;font-weight:700;font-size:14px;color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  #mobileSummaryBar .msb-item.take .msb-val{color:#7fd6a3;}
+  #mobileSummaryBar .msb-item.give .msb-val{color:var(--red-bright);}
+  @media(max-width:900px){
+    #mobileSummaryBar{display:block;}
+    body{padding-bottom:88px;} /* ເຫລືອບ່ອນຫວ່າງລຸ່ມ ບໍ່ໃຫ້ແຖບນີ້ທັບເນື້ອຫາ/footer */
+  }
+
   .pct-input{
     width:70px;
     text-align:right;
@@ -1139,6 +1161,22 @@
   <footer>ຄິດໄລ່ຝັ່ງໜ້າຈໍທັງໝົດ ບໍ່ມີການສົ່ງຂໍ້ມູນອອກໄປໃສ ຍົກເວັ້ນລາຍການທີ່ທ່ານກົດສົ່ງເຂົ້າ Google Sheet ຢ່າງຈະແຈ້ງ</footer>
 </div>
 
+<!-- ແຖບຍອດຮັບ-ສົ່ງແບບຕິດໜ້າຈໍ (ສະເພາະໂທລະສັບ, ຫນ້າຈໍກວ້າງ ≤900px — ເບິ່ງ media query ໃນ CSS) —
+     ໃຫ້ເຫັນ "ຍອດຮັບ/ຍອດສົ່ງ" ຫລ້າສຸດໄດ້ຕະຫລອດເວລາ ບໍ່ຕ້ອງເລື່ອນຫາໃບສະຫລຸບຢູ່ລຸ່ມ. ຄ່າຖືກອັບເດດພ້ອມກັນກັບ
+     #totalReceive/#totalSend (ແລະ ຝັ່ງບາດ) ທຸກຄັ້ງທີ່ຄິດໄລ່ຍອດ — ເບິ່ງຟັງຊັນ syncMobileSummaryBar(). -->
+<div id="mobileSummaryBar">
+  <div class="msb-row" id="mobileSummaryBarLak">
+    <div class="msb-item"><span class="msb-lbl">ລວມຍອດ</span><span class="msb-val mono" id="msbTotalAll">0</span></div>
+    <div class="msb-item take"><span class="msb-lbl">ຍອດຮັບ</span><span class="msb-val mono" id="msbTotalReceive">0</span></div>
+    <div class="msb-item give"><span class="msb-lbl">ຍອດສົ່ງ</span><span class="msb-val mono" id="msbTotalSend">0</span></div>
+  </div>
+  <div class="msb-row" id="mobileSummaryBarThb" style="display:none;border-top:1px dashed var(--line-soft);margin-top:6px;padding-top:6px;">
+    <div class="msb-item"><span class="msb-lbl">ລວມຍອດ (ບາດ)</span><span class="msb-val mono" id="msbTotalAllThb">0</span></div>
+    <div class="msb-item take"><span class="msb-lbl">ຍອດຮັບ (ບາດ)</span><span class="msb-val mono" id="msbTotalReceiveThb">0</span></div>
+    <div class="msb-item give"><span class="msb-lbl">ຍອດສົ່ງ (ບາດ)</span><span class="msb-val mono" id="msbTotalSendThb">0</span></div>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
 <script>
 (function(){
@@ -1531,12 +1569,20 @@
   // Uses text/plain content-type on purpose: it avoids a CORS "preflight"
   // request that Google Apps Script Web Apps do not handle, which is the
   // standard workaround for calling Apps Script from a static webpage.
+  // ໃສ່ເວລາຈຳກັດ (timeout) ໃຫ້ການສົ່ງເຂົ້າ Google Sheet ທຸກຄັ້ງ — ຖ້າ Apps Script deploy ຜິດ/ຄ້າງ/ເນັດຊ້າຫລາຍ
+  // (ບໍ່ຕອບກັບເລີຍ) ຈະບໍ່ປ່ອຍໃຫ້ປຸ່ມ "ອອກບີນ"/"ສົ່ງຍອດ" ຄ້າງລໍໄປເລື້ອຍໆ — ພໍຄົບເວລານີ້ຈະຖືວ່າລົ້ມເຫລວ
+  // ແລ້ວປ່ອຍໃຫ້ອອກບີນທ້ອງຖິ່ນ (ຄ້າງຊິ້ງພາຍຫລັງ) ໄດ້ໄວ ບໍ່ໃຫ້ລູກຄ້າລໍນານ.
+  var GS_TIMEOUT_MS = 10000;
   function gsPost(body){
+    var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = controller ? setTimeout(function(){ controller.abort(); }, GS_TIMEOUT_MS) : null;
     return fetch(CONFIG.WEBAPP_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      signal: controller ? controller.signal : undefined
     }).then(function(res){
+      if(timer) clearTimeout(timer);
       return res.text().then(function(raw){
         var data;
         try{
@@ -1557,6 +1603,12 @@
         if(!res.ok && !data){ throw new Error('HTTP ' + res.status); }
         return data;
       });
+    }).catch(function(err){
+      if(timer) clearTimeout(timer);
+      if(err && err.name === 'AbortError'){
+        throw new Error('ເຊື່ອມຕໍ່ Google Sheet ຊ້າເກີນໄປ (ເກີນ ' + (GS_TIMEOUT_MS/1000) + ' ວິນາທີ, ອາດເນັດຂາດ ຫລື Apps Script deploy ບໍ່ຖືກຕ້ອງ)');
+      }
+      throw err;
     });
   }
 
@@ -2020,25 +2072,22 @@
     var unit = (s.currency === 'thb') ? 'ບາດ' : 'ກີບ';
     var netPositive = (s.totalSendNet || 0) >= 0;
     // ຍອດສົ່ງສຸດທິ ເປັນ + = ຕ້ອງ "ສົ່ງແມ່" (ໄຮໄລສີຂຽວ), ເປັນ - = "ສົ່ງລູກ" (ໄຮໄລສີແດງ, ໝາຍເຖິງແມ່ຕ້ອງສົ່ງເງິນຄືນລູກ)
-    var netLabel = netPositive ? 'ສົ່ງແມ່ (ຍອດສົ່ງສຸດທິ ຫັກລາງວັນແລ້ວ)' : 'ສົ່ງລູກ (ຍອດສົ່ງສຸດທິ ຫັກລາງວັນແລ້ວ)';
-    var netColor = netPositive ? '#22c55e' : '#ef4444';
-    var rows = [
-      ['ວັນທີ', s.dateStr], ['ສະກຸນເງິນ', unit], ['ຈຳນວນບີນ', s.billCount],
-      ['ຍອດຂາຍລວມທັງໝົດ', KIP(s.totalAll) + ' ' + unit],
-      ['ຍອດຮັບ (ຄອມມິຊັນ ' + s.pct + '%)', KIP(s.totalReceive) + ' ' + unit],
-      ['ຍອດສົ່ງ (ກ່ອນຫັກລາງວັນ)', KIP(s.totalSendBeforeWin) + ' ' + unit],
-      ['ຖືກເລກ 2 ໂຕ', KIP(s.win2Amount) + ' ' + unit],
-      ['ຖືກເລກ 3 ໂຕ', KIP(s.win3Amount) + ' ' + unit],
-      ['ຖືກເລກ 2 ໂຕ ລ່າງ', KIP(s.win2BottomAmount) + ' ' + unit],
-      ['ລວມຈ່າຍລາງວັນ', KIP(s.totalWinAmount) + ' ' + unit]
-    ];
-    var html = '<table class="mono"><tbody>' + rows.map(function(r){
-      return '<tr><td>' + escapeHtml(String(r[0])) + '</td><td style="text-align:right;font-weight:700;">' + escapeHtml(String(r[1])) + '</td></tr>';
-    }).join('');
-    html += '<tr style="background:' + netColor + '22;"><td style="color:' + netColor + ';font-weight:800;">' + escapeHtml(netLabel) + '</td>' +
-      '<td style="text-align:right;font-weight:800;color:' + netColor + ';">' + escapeHtml(KIP(Math.abs(s.totalSendNet)) + ' ' + unit) + '</td></tr>';
-    html += '</tbody></table>';
-    wrap.innerHTML = html;
+    // ໃຊ້ style/class ດຽວກັນກັບ "ໃບສະຫລຸບ" ທ້ອງຖິ່ນ (.stub/.stub-line) ໃຫ້ໜ້າຕາຄືກັນທຸກຢ່າງ.
+    var netLabel = netPositive ? 'ສົ່ງແມ່ (ຍອດສົ່ງສຸດທິ)' : 'ສົ່ງລູກ (ຍອດສົ່ງສຸດທິ)';
+    var netClass = netPositive ? 'take' : 'give';
+    wrap.innerHTML =
+      '<div class="stub">' +
+        '<div class="stub-title mono">ໃບສະຫລຸບ ຍອດຮັບ-ສົ່ງ (' + escapeHtml(s.dateStr) + ' — ' + unit + ')</div>' +
+        '<div class="stub-line"><span class="lbl">ຈຳນວນບີນ</span><span class="val mono">' + s.billCount + '</span></div>' +
+        '<div class="stub-line hero"><span class="lbl">ລວມຍອດ</span><span class="val mono">' + KIP(s.totalAll) + '</span></div>' +
+        '<div class="stub-line take"><span class="lbl">ຍອດຮັບ ( ຄອມມິຊັນ ' + s.pct + '% )</span><span class="val mono">' + KIP(s.totalReceive) + '</span></div>' +
+        '<div class="stub-line give"><span class="lbl">ຍອດສົ່ງ (ກ່ອນຫັກລາງວັນ)</span><span class="val mono">' + KIP(s.totalSendBeforeWin) + '</span></div>' +
+        '<div class="stub-line banned"><span class="lbl">ຖືກເລກ 2 ໂຕ</span><span class="val mono">' + KIP(s.win2Amount) + '</span></div>' +
+        '<div class="stub-line banned"><span class="lbl">ຖືກເລກ 3 ໂຕ</span><span class="val mono">' + KIP(s.win3Amount) + '</span></div>' +
+        '<div class="stub-line banned"><span class="lbl">ຖືກເລກ 2 ໂຕ ລ່າງ</span><span class="val mono">' + KIP(s.win2BottomAmount) + '</span></div>' +
+        '<div class="stub-line hero"><span class="lbl">ລວມຈ່າຍລາງວັນ</span><span class="val mono">' + KIP(s.totalWinAmount) + '</span></div>' +
+        '<div class="stub-line ' + netClass + '"><span class="lbl">' + escapeHtml(netLabel) + '</span><span class="val mono">' + KIP(Math.abs(s.totalSendNet)) + '</span></div>' +
+      '</div>';
   }
 
   function initWinResultSheetSync(){
@@ -2232,6 +2281,22 @@
     return Math.round(v).toLocaleString('en-US');
   }
 
+  // ອັບເດດແຖບຍອດຮັບ-ສົ່ງຕິດໜ້າຈໍ (#mobileSummaryBar) ໃຫ້ຄືກັນກັບໃບສະຫລຸບຫລັກ (#totalReceive/#totalSend ແລະ ຝັ່ງບາດ)
+  // hideThb=true ໃຊ້ຕອນບໍ່ມີເດີມພັນສະກຸນບາດ (ເຊື່ອງແຖວບາດອອກ ບໍ່ໃຫ້ຄ້າງໂຊວ 0)
+  function syncMobileSummaryBar(currency, totalAll, totalReceive, totalSend, hideThb){
+    if(currency === 'thb'){
+      var thbRow = document.getElementById('mobileSummaryBarThb');
+      if(thbRow) thbRow.style.display = hideThb ? 'none' : '';
+      var a = document.getElementById('msbTotalAllThb'); if(a) a.textContent = KIP(totalAll) + ' ບ';
+      var r = document.getElementById('msbTotalReceiveThb'); if(r) r.textContent = KIP(totalReceive) + ' ບ';
+      var s = document.getElementById('msbTotalSendThb'); if(s) s.textContent = KIP(totalSend) + ' ບ';
+    } else {
+      var a2 = document.getElementById('msbTotalAll'); if(a2) a2.textContent = KIP(totalAll) + ' ກ';
+      var r2 = document.getElementById('msbTotalReceive'); if(r2) r2.textContent = KIP(totalReceive) + ' ກ';
+      var s2 = document.getElementById('msbTotalSend'); if(s2) s2.textContent = KIP(totalSend) + ' ກ';
+    }
+  }
+
   function nowStamp(){
     var d = new Date();
     function p(n){ n = String(n); return n.length < 2 ? '0'+n : n; }
@@ -2259,14 +2324,19 @@
     var map = {};
     for(var i=0;i<lastRows.length;i++){
       var r = lastRows[i];
-      if(r.banned) continue; // ເລກຫ້າມ ບໍ່ນັບເຂົ້າບີນ
       var currency = r.currency || 'lak';
       var key = r.lineNo + '|' + r.raw + '|' + currency;
       if(!map[key]){
-        map[key] = { lineNo: r.lineNo, raw: r.raw, numbers: [], items: [], total: 0, currency: currency };
+        map[key] = { lineNo: r.lineNo, raw: r.raw, numbers: [], items: [], total: 0, currency: currency, bannedNumbers: [] };
         order.push(key);
       }
       var g = map[key];
+      if(r.banned){
+        // ເລກຫ້າມ ບໍ່ນັບເຂົ້າຍອດ/ບີນ (ບໍ່ຄິດເງິນ) — ແຕ່ຍັງເກັບໄວ້ໃນ bannedNumbers ເພື່ອສະແດງໃນໃບບີນແບບ
+        // ຂີດຂ້າສີແດງ (ໃຫ້ລູກຄ້າເຫັນວ່າເລກນີ້ຖືກຫ້າມ ບໍ່ໄດ້ນັບ, ບໍ່ແມ່ນເມີນຫາຍໄປແບບບໍ່ຮູ້ໂຕ)
+        if(g.bannedNumbers.indexOf(r.number) === -1) g.bannedNumbers.push(r.number);
+        continue;
+      }
       if(g.numbers.indexOf(r.number) === -1) g.numbers.push(r.number);
       // ແຍກລາຄາ "ບົນ" ແລະ "ລ່າງ" ອອກຈາກກັນຢ່າງຊັດເຈນ (topValue/bottomValue ຖືກຄິດໄລ່ໄວ້ແລ້ວໃນ parseAll)
       // ເພື່ອໃຫ້ສົ່ງເຂົ້າ Google Sheet ເປັນ 2 ຊິດແຍກກັນ (ຊຸດເລກບົນ / ຊຸດເລກລ່າງ) ແລະ ຄົ້ນຫາຜົນລາງວັນ "ລ່າງ"
@@ -2295,15 +2365,35 @@
   function safeBreakRaw(s){
     return escapeHtml(s).replace(/([,\-;\/])/g, '$1\u200B');
   }
+  // ຕັດເລກທີ່ຫ້າມອອກຈາກຂໍ້ຄວາມແຖວທີ່ຈະສະແດງໃນໃບບີນເລີຍ (ບໍ່ໃຫ້ອອກມາໃນບີນອີກຕໍ່ໄປ) — ຈັບຄູ່ແບບ exact
+  // number (ບໍ່ຕິດເລກອື່ນຂ້າງໆ) ເພື່ອບໍ່ໃຫ້ "11" ໄປແທນທີ່ພາຍໃນ "911" ຜິດພາດ, ຮຽງຈາກເລກຍາວໄປສັ້ນກ່ອນຕັດ,
+  // ແລ້ວລ້າງເຄື່ອງໝາຍຄັ່ນທີ່ຄ້າງຢູ່ (ຈາກຊ່ອງທີ່ຕັດອອກໄປ) ໃຫ້ສະອາດ.
+  function stripBannedFromRaw(raw, bannedNumbers){
+    var text = raw;
+    if(bannedNumbers && bannedNumbers.length){
+      var sorted = bannedNumbers.slice().sort(function(a,b){ return b.length - a.length; });
+      sorted.forEach(function(num){
+        try{
+          var re = new RegExp('(?<![0-9])' + num + '(?![0-9])', 'g');
+          text = text.replace(re, ' ');
+        }catch(e){ /* browser ບໍ່ຮອງຮັບ lookbehind (ເກົ່າຫລາຍ) — ຂ້າມການຕັດ, ຍັງສະແດງຕົວເລກປົກກະຕິ */ }
+      });
+      // ລ້າງເຄື່ອງໝາຍຄັ່ນ/ຊ່ອງຫວ່າງທີ່ຄ້າງເປັນຄູ່/ຫລາຍໂຕ ຫລັງຈາກຕັດເລກອອກ, ແລະ ຕັດຫົວ-ທ້າຍແຖວອອກ
+      text = text.replace(/[\s,.\-;\/]{2,}/g, ', ').replace(/^[\s,.\-;\/]+|[\s,.\-;\/]+$/g, '');
+    }
+    return safeBreakRaw(text);
+  }
 
   function renderBillReceipt(bill){
     var wrap = document.getElementById('billReceiptWrap');
     if(!wrap) return;
     var brand = getBrandTextCached();
-    var cellsHtml = bill.groups.map(function(g){
+    // ຂ້າມແຖວທີ່ບໍ່ມີລາຍການເຫລືອຢູ່ເລີຍ (ທຸກເລກໃນແຖວນັ້ນຖືກຫ້າມໝົດ) — ບໍ່ໃຫ້ອອກມາໃນໃບບີນເປັນແຖວຫວ່າງ
+    var visibleGroups = (bill.groups || []).filter(function(g){ return g.items && g.items.length > 0; });
+    var cellsHtml = visibleGroups.map(function(g){
       var curLabel = (g.currency === 'thb') ? ' ບາດ' : ' ກີບ';
       return '<div class="bill-item">' +
-        '<span class="bill-item-nums mono">' + safeBreakRaw(g.raw) + (g.currency === 'thb' ? ' <b style="color:#facc15;">[ບາດ]</b>' : '') + '</span>' +
+        '<span class="bill-item-nums mono">' + stripBannedFromRaw(g.raw, g.bannedNumbers) + (g.currency === 'thb' ? ' <b style="color:#facc15;">[ບາດ]</b>' : '') + '</span>' +
         '<span class="bill-item-price mono">' + KIP(g.total) + curLabel + '</span>' +
       '</div>';
     }).join('');
@@ -3010,6 +3100,7 @@
       document.getElementById('totalBanned').textContent = KIP(totalBanned) + ' ກີບ';
       document.getElementById('totalReceive').textContent = KIP(totalReceive) + ' ກີບ';
       document.getElementById('totalSend').textContent = KIP(totalSend) + ' ກີບ';
+      syncMobileSummaryBar('lak', totalAll, totalReceive, totalSend);
 
       var winInputs = readWinInputs();
       lastWinResult = computeWinnings(rows, winInputs, 'lak');
@@ -3030,8 +3121,10 @@
         document.getElementById('win3AmountThb').textContent = KIP(thbWinResult.win3Amount) + ' ບາດ';
         document.getElementById('win2bAmountThb').textContent = KIP(thbWinResult.win2BottomAmount) + ' ບາດ';
         document.getElementById('totalWinAmountThb').textContent = KIP(thbWinResult.total) + ' ບາດ';
+        syncMobileSummaryBar('thb', totalAllThb, totalReceiveThb, totalSendThb);
       } else if(thbBox){
         thbBox.style.display = 'none';
+        syncMobileSummaryBar('thb', 0, 0, 0, true);
       }
 
       var groups = {};
