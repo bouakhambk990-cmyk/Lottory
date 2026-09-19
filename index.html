@@ -275,6 +275,14 @@
   .stub-line.take .val{color:#7fd6a3;}
   .stub-line.banned .val{color:var(--red-bright);}
 
+  /* ---- ແຖບສີຂຽວ/ແດງ ສຳລັບແຖວ "ຍອດຮັບ-ສົ່ງສຸດທິ" (ສົ່ງແມ່/ສົ່ງລູກ) — ຄິດໄລ່ ບັນທຶກຍອດຮັບ-ສົ່ງທັງໝົດ ---- */
+  .stub-line.net-bar{border-radius:10px;padding:10px 12px;margin-top:8px;border-bottom:none;}
+  .stub-line.net-bar .lbl{color:var(--cream);font-weight:700;}
+  .stub-line.net-bar.positive{background:rgba(45,212,145,.20);}
+  .stub-line.net-bar.negative{background:rgba(239,68,68,.20);}
+  .stub-line.net-bar.positive .val{color:#34d399;font-weight:800;font-size:18px;}
+  .stub-line.net-bar.negative .val{color:#f87171;font-weight:800;font-size:18px;}
+
   /* ---- ແຖບຍອດຮັບ-ສົ່ງຕິດໜ້າຈໍ (ສະເພາະໂທລະສັບ) — ໃຫ້ເຫັນຍອດຫລ້າສຸດຕະຫລອດ ບໍ່ຕ້ອງເລື່ອນຫາໃບສະຫລຸບ ---- */
   #mobileSummaryBar{
     display:none;
@@ -1572,7 +1580,7 @@
   // ໃສ່ເວລາຈຳກັດ (timeout) ໃຫ້ການສົ່ງເຂົ້າ Google Sheet ທຸກຄັ້ງ — ຖ້າ Apps Script deploy ຜິດ/ຄ້າງ/ເນັດຊ້າຫລາຍ
   // (ບໍ່ຕອບກັບເລີຍ) ຈະບໍ່ປ່ອຍໃຫ້ປຸ່ມ "ອອກບີນ"/"ສົ່ງຍອດ" ຄ້າງລໍໄປເລື້ອຍໆ — ພໍຄົບເວລານີ້ຈະຖືວ່າລົ້ມເຫລວ
   // ແລ້ວປ່ອຍໃຫ້ອອກບີນທ້ອງຖິ່ນ (ຄ້າງຊິ້ງພາຍຫລັງ) ໄດ້ໄວ ບໍ່ໃຫ້ລູກຄ້າລໍນານ.
-  var GS_TIMEOUT_MS = 10000;
+  var GS_TIMEOUT_MS = 20000;
   function gsPost(body){
     var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
     var timer = controller ? setTimeout(function(){ controller.abort(); }, GS_TIMEOUT_MS) : null;
@@ -2073,8 +2081,8 @@
     var netPositive = (s.totalSendNet || 0) >= 0;
     // ຍອດສົ່ງສຸດທິ ເປັນ + = ຕ້ອງ "ສົ່ງແມ່" (ໄຮໄລສີຂຽວ), ເປັນ - = "ສົ່ງລູກ" (ໄຮໄລສີແດງ, ໝາຍເຖິງແມ່ຕ້ອງສົ່ງເງິນຄືນລູກ)
     // ໃຊ້ style/class ດຽວກັນກັບ "ໃບສະຫລຸບ" ທ້ອງຖິ່ນ (.stub/.stub-line) ໃຫ້ໜ້າຕາຄືກັນທຸກຢ່າງ.
-    var netLabel = netPositive ? 'ສົ່ງແມ່ (ຍອດສົ່ງສຸດທິ)' : 'ສົ່ງລູກ (ຍອດສົ່ງສຸດທິ)';
-    var netClass = netPositive ? 'take' : 'give';
+    var netLabel = netPositive ? 'ສົ່ງແມ່ (ຍອດສົ່ງສຸດທິ)' : 'ແມ່ສົ່ງ (ຍອດສົ່ງສຸດທິ)';
+    var netClass = 'net-bar ' + (netPositive ? 'positive' : 'negative');
     wrap.innerHTML =
       '<div class="stub">' +
         '<div class="stub-title mono">ໃບສະຫລຸບ ຍອດຮັບ-ສົ່ງ (' + escapeHtml(s.dateStr) + ' — ' + unit + ')</div>' +
@@ -2464,7 +2472,7 @@
     }
     return Promise.all(arr.map(function(p){
       return gsPost({ action:'issueBill', token: CONFIG.SHARED_TOKEN, sheetUrl: currentUser.sheetUrl, billTab: p.billTab,
-        dateStr: p.dateStr, timeStr: p.timeStr, username: p.username, totalAll: p.totalAll, lineGroups: p.lineGroups })
+        dateStr: p.dateStr, timeStr: p.timeStr, username: p.username, totalAll: p.totalAll, requestId: p.requestId, lineGroups: p.lineGroups })
         .then(function(res){ return { p: p, ok: !!(res && res.ok) }; })
         .catch(function(){ return { p: p, ok: false }; });
     })).then(function(results){
@@ -2493,6 +2501,13 @@
     var timeStr = billTimeStr(now);
     var username = currentUser ? currentUser.username : 'guest';
     var canSendToSheet = SHEETS_ENABLED && currentUser && currentUser.sheetUrl && /\/exec$/.test((CONFIG.WEBAPP_URL||'').trim());
+    // requestId ດຽວຕໍ່ 1 ຄັ້ງກົດອອກບີນ ຕໍ່ 1 ສະກຸນເງິນ — ໃຊ້ຊ້ຳກັນທຸກຄັ້ງທີ່ລອງສົ່ງອັນດຽວກັນນີ້ໃໝ່ (ລວມທັງ
+    // retryPendingBills ພາຍຫລັງ) ເພື່ອໃຫ້ຝັ່ງ Apps Script ກວດຈັບ+ຂ້າມການບັນທຶກຊ້ຳ ຖ້າຄັ້ງທຳອິດຕົວຈິງແລ້ວ
+    // ເຮັດສຳເລັດຢູ່ຝັ່ງເຊີບເວີ ພຽງແຕ່ຄຳຕອບກັບມາຫາລູກຄ້າຊ້າ/ບໍ່ຮອດ (ໝົດເວລາ gsPost, ເນັດຂາດຂະນະລໍຄຳຕອບ ແລະ ອື່ນໆ)
+    // — ນີ້ຄືວິທີແກ້ບັນຫາ "ອອກບີນຊ້ຳຊ້ອນ" (2 ແຖວໃນ Sheet ຈາກການກົດອອກບີນຄັ້ງດຽວ).
+    function makeRequestId(){ return 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2,10); }
+    var lakRequestId = makeRequestId();
+    var thbRequestId = makeRequestId();
 
     if(!canSendToSheet){
       var billNoLocal = nextLocalBillNo(dateStr);
@@ -2511,18 +2526,18 @@
       });
     }
 
-    function postGroups(gr, billTab, totalAllCur){
+    function postGroups(gr, billTab, totalAllCur, requestId){
       if(gr.length === 0) return Promise.resolve(null);
       return gsPost({
         action: 'issueBill', token: CONFIG.SHARED_TOKEN, sheetUrl: currentUser.sheetUrl, billTab: billTab,
-        dateStr: dateStr, timeStr: timeStr, username: username, totalAll: totalAllCur,
+        dateStr: dateStr, timeStr: timeStr, username: username, totalAll: totalAllCur, requestId: requestId,
         lineGroups: gr.map(function(g){ return { lineNo: g.lineNo, items: g.items }; })
       });
     }
 
     return Promise.all([
-      postGroups(lakGroups, 'Bills', lakTotal),
-      postGroups(thbGroups, 'Bills_THB', thbTotal)
+      postGroups(lakGroups, 'Bills', lakTotal, lakRequestId),
+      postGroups(thbGroups, 'Bills_THB', thbTotal, thbRequestId)
     ]).then(function(results){
       var lakRes = results[0], thbRes = results[1];
       var lakFailed = lakGroups.length > 0 && (!lakRes || !lakRes.ok);
@@ -2534,8 +2549,8 @@
         var billNoFallback = nextLocalBillNo(dateStr);
         var billFallback = { billNo: billNoFallback, dateLabel: dateLabel, timeStr: timeStr, username: username, groups: groups, totalAll: lastTotalAll };
         renderBillReceipt(billFallback);
-        if(lakFailed) queuePendingBill({ billTab:'Bills', dateStr:dateStr, timeStr:timeStr, username:username, totalAll:lakTotal, lineGroups: lakGroups.map(function(g){ return { lineNo:g.lineNo, items:g.items }; }) });
-        if(thbFailed) queuePendingBill({ billTab:'Bills_THB', dateStr:dateStr, timeStr:timeStr, username:username, totalAll:thbTotal, lineGroups: thbGroups.map(function(g){ return { lineNo:g.lineNo, items:g.items }; }) });
+        if(lakFailed) queuePendingBill({ billTab:'Bills', dateStr:dateStr, timeStr:timeStr, username:username, totalAll:lakTotal, requestId: lakRequestId, lineGroups: lakGroups.map(function(g){ return { lineNo:g.lineNo, items:g.items }; }) });
+        if(thbFailed) queuePendingBill({ billTab:'Bills_THB', dateStr:dateStr, timeStr:timeStr, username:username, totalAll:thbTotal, requestId: thbRequestId, lineGroups: thbGroups.map(function(g){ return { lineNo:g.lineNo, items:g.items }; }) });
         backupToFirebase('bills', {
           billNo: billNoFallback, username: username, dateStr: dateStr, timeStr: timeStr, totalAll: lastTotalAll,
           groups: groups.map(function(g){ return { raw: g.raw, total: g.total, currency: g.currency }; }),
@@ -2565,8 +2580,8 @@
       var billNoErr = nextLocalBillNo(dateStr);
       var billErr = { billNo: billNoErr, dateLabel: dateLabel, timeStr: timeStr, username: username, groups: groups, totalAll: lastTotalAll };
       renderBillReceipt(billErr);
-      if(lakGroups.length > 0) queuePendingBill({ billTab:'Bills', dateStr:dateStr, timeStr:timeStr, username:username, totalAll:lakTotal, lineGroups: lakGroups.map(function(g){ return { lineNo:g.lineNo, items:g.items }; }) });
-      if(thbGroups.length > 0) queuePendingBill({ billTab:'Bills_THB', dateStr:dateStr, timeStr:timeStr, username:username, totalAll:thbTotal, lineGroups: thbGroups.map(function(g){ return { lineNo:g.lineNo, items:g.items }; }) });
+      if(lakGroups.length > 0) queuePendingBill({ billTab:'Bills', dateStr:dateStr, timeStr:timeStr, username:username, totalAll:lakTotal, requestId: lakRequestId, lineGroups: lakGroups.map(function(g){ return { lineNo:g.lineNo, items:g.items }; }) });
+      if(thbGroups.length > 0) queuePendingBill({ billTab:'Bills_THB', dateStr:dateStr, timeStr:timeStr, username:username, totalAll:thbTotal, requestId: thbRequestId, lineGroups: thbGroups.map(function(g){ return { lineNo:g.lineNo, items:g.items }; }) });
       return {
         ok:true, billNo: billNoErr, sentToSheet: false,
         note: 'ອອກບີນ #' + billNoErr + ' (ນັບຢູ່ອຸປະກອນນີ້ — ຄ້າງໄວ້ຊິ້ງເຂົ້າ Google Sheet ອັດຕະໂນມັດພາຍຫລັງ)',
@@ -3483,11 +3498,11 @@
     '    var tabName = body.billTab || "Bills";',
     '    var sh = ss.getSheetByName(tabName);',
     '    // ຄໍລຳແຍກຊັດເຈນ: ຊຸດເລກ "ບົນ" (ລວມເລກ 3 ໂຕ) ແລະ ຊຸດເລກ "ລ່າງ" ແຍກກັນຄົນລະຄໍລຳ ພ້ອມລາຄາ,',
-    '    // ແລ້ວລວມຍອດທັງບີນຢູ່ຄໍລຳສຸດທ້າຍ.',
-    '    var expectedHeaders = ["ວັນທີ","ເວລາ","ເລກທີ່ບີນ","ຜູ້ໃຊ້","ຊຸດເລກບົນ (ພ້ອມລາຄາ)","ຊຸດເລກລ່າງ (ພ້ອມລາຄາ)","ລວມລາຄາທັງໝົດ"];',
+    '    // ແລ້ວລວມຍອດທັງບີນຢູ່ຄໍລຳສຸດທ້າຍ. ຄໍລຳ H ເກັບ "RequestId" (ຕົວກັນຊ້ຳ, ບໍ່ໂຊວ໌ໃຫ້ລູກຄ້າເຫັນ).',
+    '    var expectedHeaders = ["ວັນທີ","ເວລາ","ເລກທີ່ບີນ","ຜູ້ໃຊ້","ຊຸດເລກບົນ (ພ້ອມລາຄາ)","ຊຸດເລກລ່າງ (ພ້ອມລາຄາ)","ລວມລາຄາທັງໝົດ","RequestId"];',
     '    if(!sh){',
     '      sh = ss.insertSheet(tabName);',
-    '      sh.getRange(1,1,1,7).setValues([expectedHeaders]);',
+    '      sh.getRange(1,1,1,8).setValues([expectedHeaders]);',
     '    } else {',
     '      // ຖ້າແທັບ Bills ນີ້ມີຢູ່ແລ້ວຈາກໂຄ້ດເກົ່າ (ຮູບແບບເກົ່າ 6 ຄໍລຳ, ຄໍລຳ E ເປັນ "ເລກທີ່ພິມ (ຊຸດ)" ລວມບົນ-ລ່າງ',
     '      // ປົນກັນ) — ແຊກຄໍລຳໃໝ່ 1 ຄໍລຳຫລັງ E ເພື່ອຍ້າຍຄໍລຳ "ລວມລາຄາທັງໝົດ" ເກົ່າ (F) ໄປເປັນ G ອັດຕະໂນມັດ',
@@ -3496,9 +3511,9 @@
     '      var isOldFormat = String(curHeaders[4]||"") === "ເລກທີ່ພິມ (ຊຸດ)";',
     '      if(isOldFormat) sh.insertColumnAfter(5);',
     '      var needsUpdate = false;',
-    '      var nowHeaders = sh.getRange(1,1,1,7).getValues()[0];',
-    '      for(var hi=0; hi<7; hi++){ if(nowHeaders[hi] !== expectedHeaders[hi]){ needsUpdate = true; break; } }',
-    '      if(needsUpdate) sh.getRange(1,1,1,7).setValues([expectedHeaders]);',
+    '      var nowHeaders = sh.getRange(1,1,1,8).getValues()[0];',
+    '      for(var hi=0; hi<8; hi++){ if(nowHeaders[hi] !== expectedHeaders[hi]){ needsUpdate = true; break; } }',
+    '      if(needsUpdate) sh.getRange(1,1,1,8).setValues([expectedHeaders]);',
     '    }',
     '    // ບັງຄັບໃຫ້ຄໍລຳ A (ວັນທີ) ແລະ B (ເວລາ) ເປັນ "Plain text" ສະເໝີ — ບໍ່ດັ່ງນັ້ນ Google Sheets ຈະແປງຄ່າ',
     '    // "2026-08-14" / "19:37:10" ທີ່ພິມເຂົ້າໄປໃຫ້ກາຍເປັນວັນທີ/ເວລາ (Date object) ໂດຍອັດຕະໂນມັດ,',
@@ -3508,14 +3523,19 @@
     '    var lineGroups = body.lineGroups || [];',
     '    if(lineGroups.length === 0) return { ok:false, error:"ບໍ່ມີລາຍການໃຫ້ອອກບີນ" };',
     '    var lastRow = sh.getLastRow();',
-    '    // ນັບເລກທີ່ບີນ = ຄ່າສູງສຸດຂອງ "ເລກທີ່ບີນ" (ຄໍ C) ໃນວັນດຽວກັນ +1',
+    '    // ນັບເລກທີ່ບີນ = ຄ່າສູງສຸດຂອງ "ເລກທີ່ບີນ" (ຄໍ C) ໃນວັນດຽວກັນ +1 — ພ້ອມກັນນັ້ນ ກວດ requestId (ຄໍ H)',
+    '    // ວ່າເຄີຍບັນທຶກໄປແລ້ວບໍ (ລູກຄ້າສົ່ງອັນດຽວກັນຊ້ຳ ຍ້ອນ timeout/retry) — ຖ້າພົບ ໃຫ້ຄືນເລກທີ່ບີນເກົ່າ',
+    '    // ໂດຍບໍ່ຂຽນແຖວໃໝ່ ເພື່ອປ້ອງກັນບີນຊ້ຳຊ້ອນ (2 ແຖວ) ໃນຊີດ.',
     '    // ປ້ອງກັນບັນຫາຄໍລຳ A ຖືກປ່ຽນເປັນ Date object ໂດຍ Sheets (ເກີດຈາກແຖວເກົ່າກ່ອນແກ້) —',
     '    // normDate_() ແປງທັງ Date object ແລະ String ໃຫ້ເປັນຮູບແບບ "yyyy-MM-dd" ດຽວກັນກ່ອນປຽບທຽບ.',
     '    var billNo = 1;',
     '    if(lastRow >= 2){',
-    '      var scanRows = sh.getRange(2,1,lastRow-1,3).getValues(); // A=ວັນທີ, C=ເລກທີ່ບີນ',
+    '      var scanRows = sh.getRange(2,1,lastRow-1,8).getValues(); // A=ວັນທີ, C=ເລກທີ່ບີນ, H=RequestId',
     '      var maxNo = 0;',
     '      for(var i=0;i<scanRows.length;i++){',
+    '        if(body.requestId && String(scanRows[i][7]||"") === String(body.requestId)){',
+    '          return { ok:true, billNo: Number(scanRows[i][2]) || 0, rowsWritten: 0, dedup:true };',
+    '        }',
     '        if(normDate_(scanRows[i][0]) === String(body.dateStr)){',
     '          var n = Number(scanRows[i][2]) || 0;',
     '          if(n > maxNo) maxNo = n;',
@@ -3535,8 +3555,8 @@
     '    });',
     '    var topCell = topParts.join(" ");',
     '    var bottomCell = bottomParts.join(" ");',
-    '    var newRow = [ body.dateStr || "", body.timeStr || "", billNo, body.username || "", topCell, bottomCell, body.totalAll || 0 ];',
-    '    sh.getRange(lastRow+1, 1, 1, 7).setValues([newRow]);',
+    '    var newRow = [ body.dateStr || "", body.timeStr || "", billNo, body.username || "", topCell, bottomCell, body.totalAll || 0, body.requestId || "" ];',
+    '    sh.getRange(lastRow+1, 1, 1, 8).setValues([newRow]);',
     '    return { ok:true, billNo: billNo, rowsWritten: 1 };',
     '  }catch(err){',
     '    return { ok:false, error:"ອອກບີນບໍ່ສຳເລັດ: " + String(err && err.message ? err.message : err) };',
