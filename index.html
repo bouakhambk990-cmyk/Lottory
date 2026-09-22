@@ -2464,13 +2464,19 @@
     el.style.display = n > 0 ? '' : 'none';
   }
   // ພະຍາຍາມສົ່ງບີນທີ່ຄ້າງທັງໝົດເຂົ້າ Sheet ຄືນ — ໃບໃດສຳເລັດ ຈະຖືກເອົາອອກຈາກຄິວ, ໃບໃດຍັງລົ້ມເຫລວ ຄ້າງໄວ້ຄືເກົ່າ
+  // ກັນຄ້າງ 2 ຄັ້ງພ້ອມກັນ (concurrent): ຟັງຊັນນີ້ຖືກເອີ້ນຈາກ 3 ບ່ອນແຍກກັນ (ກົດປຸ່ມເອງ, ອັດຕະໂນມັດ 3 ວິນາທີ
+  // ຫລັງເປີດແອັບ, ແລະ ອັດຕະໂນມັດທຸກ 30 ວິນາທີ) — ຖ້າ Apps Script ຕອບຊ້າ (ເຄືອຂ່າຍຊ້າ) 2 ໃນ 3 ອາດຊ້ອນກັນໄດ້
+  // ຖ້າບໍ່ກັນໄວ້, ທັງ 2 ຈະສົ່ງບີນຄ້າງອັນດຽວກັນອອກໄປພ້ອມກັນ = ບີນຊ້ຳໃນ Sheet (ນີ້ຄືສາເຫດຫລັກຂອງບັນຫາ
+  // "ຊິ້ງບີນຊ້ຳ" ທີ່ພົບ) — ຈຶ່ງໃຫ້ທຸກການເອີ້ນທີ່ຊ້ອນກັນໃຊ້ Promise ອັນດຽວກັນນີ້ຮ່ວມກັນ ແທນທີ່ຈະສົ່ງໃໝ່ຊ້ຳ.
+  var retryPendingBillsInFlight = null;
   function retryPendingBills(){
+    if(retryPendingBillsInFlight) return retryPendingBillsInFlight;
     var arr = getPendingBills();
     if(arr.length === 0) return Promise.resolve({ ok:true, synced:0, remaining:0 });
     if(!currentUser || !currentUser.sheetUrl || !/\/exec$/.test((CONFIG.WEBAPP_URL||'').trim())){
       return Promise.resolve({ ok:false, error:'ຍັງເຊື່ອມຕໍ່ Google Sheet ບໍ່ໄດ້' });
     }
-    return Promise.all(arr.map(function(p){
+    retryPendingBillsInFlight = Promise.all(arr.map(function(p){
       return gsPost({ action:'issueBill', token: CONFIG.SHARED_TOKEN, sheetUrl: currentUser.sheetUrl, billTab: p.billTab,
         dateStr: p.dateStr, timeStr: p.timeStr, username: p.username, totalAll: p.totalAll, requestId: p.requestId, lineGroups: p.lineGroups })
         .then(function(res){ return { p: p, ok: !!(res && res.ok) }; })
@@ -2480,10 +2486,21 @@
       setPendingBills(stillPending);
       updatePendingBillsBadge();
       return { ok:true, synced: results.length - stillPending.length, remaining: stillPending.length };
-    });
+    }).then(function(res){ retryPendingBillsInFlight = null; return res; },
+            function(err){ retryPendingBillsInFlight = null; throw err; });
+    return retryPendingBillsInFlight;
   }
 
+  var issueBillInFlight = null;
   function issueBillNow(){
+    // ກັນອອກບີນຊ້ອນກັນ (ຊັ້ນປ້ອງກັນເພີ່ມ, ນອກຈາກ billBtn.disabled) — ຖ້າກຳລັງອອກບີນຢູ່ແລ້ວ ໃຫ້ໃຊ້ Promise
+    // ອັນເກົ່ານັ້ນຮ່ວມກັນ ແທນທີ່ຈະເລີ່ມອອກບີນໃໝ່ຊ້ຳ (ປ້ອງກັນກົດຊ້ຳໄວ/ຫລາຍບ່ອນເອີ້ນມາພ້ອມກັນ).
+    if(issueBillInFlight) return issueBillInFlight;
+    var p = issueBillNow_();
+    issueBillInFlight = p.then(function(res){ issueBillInFlight = null; return res; }, function(err){ issueBillInFlight = null; throw err; });
+    return issueBillInFlight;
+  }
+  function issueBillNow_(){
     if(!lastRows || lastRows.length === 0 || !lastTotalAll || lastTotalAll <= 0){
       return Promise.resolve({ ok:false, error:'ຍັງບໍ່ມີຍອດ — ພິມຊຸດເລກ ແລະ ກົດ "ຄິດໄລ່ຍອດ" ກ່ອນອອກບີນ' });
     }
@@ -2623,7 +2640,7 @@
       }
       return escapeHtml(tok);
     }).join(' ');
-    var winAmt = rate > 0 ? roundToNearestThousand(stake * rate) : null;
+    var winAmt = rate > 0 ? roundAmount(stake * rate, currency) : null;
     var catBadge = categoryLabel ? '<span class="hit-cat">' + escapeHtml(categoryLabel) + '</span> ' : '';
     var countNote = hitCount > 1 ? ' <span class="hit-count">(ຖືກ ' + hitCount + ' ເທື່ອໃນບີນນີ້)</span>' : '';
     var hitLine = '<div class="hit-amount">' + catBadge + '🎯 ຖືກເລກ <b>' + escapeHtml(query) + '</b>' + countNote + ' — ຍອດຖືກ <b class="hit-stake">' + KIP(stake) + ' ' + curUnit + '</b>' +
@@ -3016,11 +3033,23 @@
   // currency: 'lak' (default) ຫລື 'thb' — ຄິດໄລ່ລາງວັນສະເພາະແຖວທີ່ເປັນສະກຸນເງິນນັ້ນເທົ່ານັ້ນ (ບໍ່ປົນກັນ)
   // ປັດເສດຍອດຈ່າຍລາງວັນເປັນຫລັກພັນ: ເສດ 500 ຂຶ້ນໄປ ປັດຂຶ້ນເປັນ 1,000 / ຕ່ຳກວ່າ 500 ປັດລົງເປັນ 0
   // ໃຊ້ຮ່ວມກັນທັງ 2 ຝັ່ງ (client ນີ້ ແລະ ສະບັບ GAS ໃນ dailySummary_) — ຕ້ອງໃຫ້ຄິດໄລ່ໄດ້ຄ່າດຽວກັນສະເໝີ
+  // ໃຊ້ສະເພາະສະກຸນ "ກີບ" ເທົ່ານັ້ນ (ຕົວເລກກີບໃຫຍ່, ຫລັກພັນຖືວ່າຈຸ້ຍ) — ຫ້າມໃຊ້ກັບບາດ (ເບິ່ງ roundThbAmount)!
   function roundToNearestThousand(v){
     var n = Math.round(v || 0);
     var rem = ((n % 1000) + 1000) % 1000; // ກັນຄ່າຕິດລົບ
     var base = n - rem;
     return rem >= 500 ? base + 1000 : base;
+  }
+  // ປັດເສດຍອດ (ຄອມມິຊັນ/ລາງວັນ) ຝັ່ງ "ບາດ" — ບາດເປັນຕົວເລກນ້ອຍກວ່າກີບຫລາຍ (ຕົວຢ່າງ 1,200 ບາດ)
+  // ຖ້າໃຊ້ roundToNearestThousand ຄືກັບກີບ ຈະໄດ້ 0 ສະເໝີ (ຕົວຢ່າງ 1,200*20%=240 → ປັດເປັນ 0 ໝົດ) —
+  // ນີ້ຄືສາເຫດແທ້ຂອງບັນຫາ "ຍອດຄອມມິຊັນເງິນບາດບໍ່ອ່ານ (ອອກເປັນ 0 ຕະຫລອດ)". ບາດຈຶ່ງປັດເສດແຄ່ຫລັກໜ່ວຍ
+  // (ຈຳນວນເຕັມ) ພໍ ບໍ່ຕ້ອງປັດເປັນຫລັກພັນຄືກີບ.
+  function roundThbAmount(v){
+    return Math.round(v || 0);
+  }
+  // ຟັງຊັນປັດເສດທີ່ຖືກຕ້ອງ ອີງຕາມສະກຸນເງິນ — ໃຊ້ຮ່ວມກັນທຸກບ່ອນທີ່ຄິດໄລ່ຄອມມິຊັນ/ລາງວັນ ເພື່ອບໍ່ໃຫ້ພາດຄືນອີກ
+  function roundAmount(v, currency){
+    return (currency === 'thb') ? roundThbAmount(v) : roundToNearestThousand(v);
   }
 
   function computeWinnings(rows, win, currency){
@@ -3044,17 +3073,17 @@
     Object.keys(groups).forEach(function(num){
       var g = groups[num];
       if(win.n2 && num === win.n2 && g.topStake > 0){
-        var amt = roundToNearestThousand(g.topStake * win.r2);
+        var amt = roundAmount(g.topStake * win.r2, cur);
         win2Amount += amt;
         win2Rows.push({ number:num, stake:g.topStake, amount:amt });
       }
       if(win.n2b && num === win.n2b && g.bottomStake > 0){
-        var amtb = roundToNearestThousand(g.bottomStake * win.r2b);
+        var amtb = roundAmount(g.bottomStake * win.r2b, cur);
         win2BottomAmount += amtb;
         win2BRows.push({ number:num, stake:g.bottomStake, amount:amtb });
       }
       if(win.n3 && num === win.n3 && g.threeStake > 0){
-        var amt3 = roundToNearestThousand(g.threeStake * win.r3);
+        var amt3 = roundAmount(g.threeStake * win.r3, cur);
         win3Amount += amt3;
         win3Rows.push({ number:num, stake:g.threeStake, amount:amt3 });
       }
@@ -3107,7 +3136,7 @@
       // ຍ້ອນ % ຄອມອາດຄິດໄລ່ອອກມາເປັນເລກບໍ່ກົມ (ເຊັ່ນ 8% ຂອງ 12,750,000 = 1,020,000 ແຕ່ຖ້າ 8.3% ອາດໄດ້ເລກແປກໆ)
       var totalReceive = roundToNearestThousand(totalAll * (pct/100));
       var totalSend = totalAll - totalReceive;
-      var totalReceiveThb = roundToNearestThousand(totalAllThb * (pct/100));
+      var totalReceiveThb = roundThbAmount(totalAllThb * (pct/100));
       var totalSendThb = totalAllThb - totalReceiveThb;
       lastTotalAll = totalAll + totalAllThb; // ໃຊ້ເປັນຕົວກວດ ">0" ກ່ອນອອກບີນ (ອອກບີນຈິງແຍກຄິດຄືນຕາມສະກຸນເງິນ)
 
@@ -3522,6 +3551,20 @@
     '    sh.getRange(2, 1, Math.max(sh.getMaxRows()-1,1), 2).setNumberFormat("@");',
     '    var lineGroups = body.lineGroups || [];',
     '    if(lineGroups.length === 0) return { ok:false, error:"ບໍ່ມີລາຍການໃຫ້ອອກບີນ" };',
+    '    // ລ໋ອກ (LockService) ຮອບການ "ອ່ານແຖວສຸດທ້າຍ → ຄິດເລກທີ່ບີນ → ກວດ requestId ຊ້ຳ → ຂຽນແຖວໃໝ່" —',
+    '    // ຖ້າບໍ່ລ໋ອກ, Apps Script ສາມາດປະມວນຜົນ 2 ຄຳຂໍທີ່ມາພ້ອມກັນ (concurrent) ໄດ້ຈິງ (ຕົວຢ່າງ: ລູກຄ້າ',
+    '    // ກົດອອກບີນ 2 ອຸປະກອນພ້ອມກັນ, ຫລືຝັ່ງເວັບກົດ "ຊິ້ງບີນຄ້າງ" ຊ້ອນກັບການລອງອັດຕະໂນມັດ) — ທັງ 2 ຈະອ່ານ',
+    '    // "ແຖວສຸດທ້າຍ" ອັນດຽວກັນ ກ່ອນອັນໃດອັນໜຶ່ງທັນຂຽນທັນ, ຄຳນວນເລກທີ່ບີນຄົນລະອັນ ແລ້ວຂຽນຄົນລະແຖວ —',
+    '    // ນີ້ຄືສາເຫດແທ້ຂອງບັນຫາ "ບີນຊ້ຳຊ້ອນ" (2 ແຖວ ເນື້ອໃນຄືກັນ ແຕ່ຄົນລະເລກທີ່ບີນ). ລ໋ອກນີ້ບັງຄັບໃຫ້ແຕ່ລະ',
+    '    // ຄຳຂໍປະມວນຜົນທີລະອັນ (ບໍ່ວ່າຈະມາຈາກໃສ) — ແກ້ບັນຫາໄດ້ແທ້ 100% ບໍ່ວ່າຈະເປັນ retry, ເປີດ 2 ອຸປະກອນ,',
+    '    // ຫລືກົດຊ້ຳໄວກໍ່ຕາມ.',
+    '    var lock = LockService.getScriptLock();',
+    '    try{',
+    '      lock.waitLock(30000);',
+    '    }catch(lockErr){',
+    '      return { ok:false, error:"ລະບົບກຳລັງບັນທຶກບີນອື່ນຢູ່ພ້ອມກັນ, ລອງໃໝ່ອີກຄັ້ງ (ລໍ lock ດົນເກີນໄປ)" };',
+    '    }',
+    '    try{',
     '    var lastRow = sh.getLastRow();',
     '    // ນັບເລກທີ່ບີນ = ຄ່າສູງສຸດຂອງ "ເລກທີ່ບີນ" (ຄໍ C) ໃນວັນດຽວກັນ +1 — ພ້ອມກັນນັ້ນ ກວດ requestId (ຄໍ H)',
     '    // ວ່າເຄີຍບັນທຶກໄປແລ້ວບໍ (ລູກຄ້າສົ່ງອັນດຽວກັນຊ້ຳ ຍ້ອນ timeout/retry) — ຖ້າພົບ ໃຫ້ຄືນເລກທີ່ບີນເກົ່າ',
@@ -3558,6 +3601,9 @@
     '    var newRow = [ body.dateStr || "", body.timeStr || "", billNo, body.username || "", topCell, bottomCell, body.totalAll || 0, body.requestId || "" ];',
     '    sh.getRange(lastRow+1, 1, 1, 8).setValues([newRow]);',
     '    return { ok:true, billNo: billNo, rowsWritten: 1 };',
+    '    } finally {',
+    '      lock.releaseLock();',
+    '    }',
     '  }catch(err){',
     '    return { ok:false, error:"ອອກບີນບໍ່ສຳເລັດ: " + String(err && err.message ? err.message : err) };',
     '  }',
@@ -3755,13 +3801,18 @@
     '        }',
     '      }',
     '    }',
-    '    // ປັດເສດຍອດຈ່າຍລາງວັນເປັນຫລັກພັນ: ເສດ 500 ຂຶ້ນໄປ ປັດຂຶ້ນເປັນ 1,000 / ຕ່ຳກວ່າ 500 ປັດລົງເປັນ 0',
+    '    // ປັດເສດຍອດຈ່າຍລາງວັນເປັນຫລັກພັນ (ກີບ): ເສດ 500 ຂຶ້ນໄປ ປັດຂຶ້ນເປັນ 1,000 / ຕ່ຳກວ່າ 500 ປັດລົງເປັນ 0',
     '    // (ຄິດໄລ່ຢູ່ນີ້ຄືກັນກັບຝັ່ງ client — ຄິດລວມ stake ຂອງເລກນັ້ນທັງໝົດກ່ອນ ແລ້ວປັດເສດຄັ້ງດຽວຫລັງຄູນອັດຕາ)',
+    '    // ສະກຸນ "ບາດ" (Bills_THB) ຕ້ອງປັດຄົນລະແບບ — ຕົວເລກນ້ອຍກວ່າກີບຫລາຍ (ຕົວຢ່າງ 1,200 ບາດ) ຖ້າປັດເປັນ',
+    '    // ຫລັກພັນຄືກີບ ຈະໄດ້ 0 ຕະຫລອດ (ຕົວຢ່າງ 1,200*20%=240 → ປັດເປັນ 0) — ນີ້ຄືສາເຫດແທ້ຂອງບັນຫາ',
+    '    // "ຍອດຄອມມິຊັນເງິນບາດບໍ່ອ່ານ (ອອກ 0 ຕະຫລອດ)". ບາດຈຶ່ງປັດເສດແຄ່ຫລັກໜ່ວຍ (ຈຳນວນເຕັມ) ພໍ.',
+    '    var isThb = String(body.billTab||"") === "Bills_THB";',
     '    var roundTo1000_ = function(v){ var n = Math.round(v||0); var rem = ((n % 1000) + 1000) % 1000; var base = n - rem; return rem >= 500 ? base + 1000 : base; };',
-    '    var win2Amount = roundTo1000_(win2Stake * r2);',
-    '    var win3Amount = roundTo1000_(win3Stake * r3);',
-    '    var win2BottomAmount = roundTo1000_(win2BottomStake * r2b);',
-    '    var totalReceive = roundTo1000_(totalAll * (pct/100));',
+    '    var roundAmt_ = function(v){ return isThb ? Math.round(v||0) : roundTo1000_(v); };',
+    '    var win2Amount = roundAmt_(win2Stake * r2);',
+    '    var win3Amount = roundAmt_(win3Stake * r3);',
+    '    var win2BottomAmount = roundAmt_(win2BottomStake * r2b);',
+    '    var totalReceive = roundAmt_(totalAll * (pct/100));',
     '    var totalSendBeforeWin = totalAll - totalReceive;',
     '    var totalWinAmount = win2Amount + win3Amount + win2BottomAmount;',
     '    var totalSendNet = totalSendBeforeWin - totalWinAmount;',
