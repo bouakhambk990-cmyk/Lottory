@@ -1580,8 +1580,8 @@
   // ໃສ່ເວລາຈຳກັດ (timeout) ໃຫ້ການສົ່ງເຂົ້າ Google Sheet ທຸກຄັ້ງ — ຖ້າ Apps Script deploy ຜິດ/ຄ້າງ/ເນັດຊ້າຫລາຍ
   // (ບໍ່ຕອບກັບເລີຍ) ຈະບໍ່ປ່ອຍໃຫ້ປຸ່ມ "ອອກບີນ"/"ສົ່ງຍອດ" ຄ້າງລໍໄປເລື້ອຍໆ — ພໍຄົບເວລານີ້ຈະຖືວ່າລົ້ມເຫລວ
   // ແລ້ວປ່ອຍໃຫ້ອອກບີນທ້ອງຖິ່ນ (ຄ້າງຊິ້ງພາຍຫລັງ) ໄດ້ໄວ ບໍ່ໃຫ້ລູກຄ້າລໍນານ.
-  var GS_TIMEOUT_MS = 20000;
-  function gsPost(body){
+  var GS_TIMEOUT_MS = 15000;
+  function gsPostOnce(body){
     var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
     var timer = controller ? setTimeout(function(){ controller.abort(); }, GS_TIMEOUT_MS) : null;
     return fetch(CONFIG.WEBAPP_URL, {
@@ -1605,7 +1605,8 @@
             'ເຊີບເວີບໍ່ໄດ້ຕອບກັບເປັນ JSON (HTTP ' + res.status + '). ' +
             'ສາເຫດທີ່ພົບເລື້ອຍທີ່ສຸດ: (1) Apps Script deploy "Who has access" ບໍ່ໄດ້ຕັ້ງເປັນ "Anyone", ' +
             '(2) ແກ້ໂຄ້ດ Apps Script ແລ້ວແຕ່ບໍ່ໄດ້ກົດ Deploy > Manage deployments > ແກ້ໄຂ (ຮູບດິນສໍ) > New version ' +
-            '(ໂຕ URL /exec ເກົ່າຍັງໃຊ້ໂຄ້ດເກົ່າຢູ່), ຫຼື (3) CONFIG.WEBAPP_URL ຢູ່ຫົວໄຟລ໌ index.html ຜິດ/ບໍ່ໄດ້ອັບເດດ.'
+            '(ໂຕ URL /exec ເກົ່າຍັງໃຊ້ໂຄ້ດເກົ່າຢູ່), ຫຼື (3) CONFIG.WEBAPP_URL ຢູ່ຫົວໄຟລ໌ index.html ຜິດ/ບໍ່ໄດ້ອັບເດດ. ' +
+            '(ຖ້າ URL/deploy ຖືກຕ້ອງດີຢູ່ແລ້ວ ອາດເປັນແຄ່ Google Apps Script ຮັບຄຳຂໍພ້ອມກັນຫລາຍເກີນໄປຊົ່ວຄາວ — ລະບົບຈະລອງໃໝ່ໃຫ້ອັດຕະໂນມັດແລ້ວ)'
           );
         }
         if(!res.ok && !data){ throw new Error('HTTP ' + res.status); }
@@ -1618,6 +1619,24 @@
       }
       throw err;
     });
+  }
+  // gsPost ແມ່ນຕົວຫໍ່ຮອບ gsPostOnce ທີ່ "ລອງໃໝ່ອັດຕະໂນມັດ" ເມື່ອການເຊື່ອມຕໍ່ລົ້ມເຫລວລະດັບ transport
+  // (ການເຊື່ອມຕໍ່ຂາດ, timeout, server ບໍ່ຕອບເປັນ JSON — ບໍ່ແມ່ນ error ທາງທຸລະກິດທີ່ sheet ຕອບກັບມາຖືກຕ້ອງ
+  // ແຕ່ {ok:false, error:...}) — ແກ້ບັນຫາ "ຄົ້ນຫາບິນທີ່ຖືກ" ມັກລົ້ມເຫລວເປັນບາງຄັ້ງ (HTTP 404 / Load failed)
+  // ເຊິ່ງເກີດຈາກການຍິງຫລາຍຄຳຂໍເຂົ້າ Apps Script ອັນດຽວກັນພ້ອມໆກັນ (ຫລາຍໝວດ 2ໂຕ/3ໂຕ/2ໂຕລ່າງ x 2 ສະກຸນເງິນ
+  // = ເຖິງ 6 ຄຳຂໍພ້ອມກັນ) ເຊິ່ງບາງຄັ້ງ Google ຮັບບໍ່ທັນ/ຕອບຜິດພາດຊົ່ວຄາວ — ລອງໃໝ່ອັດຕະໂນມັດຈະຜ່ານເກືອບທຸກຄັ້ງ
+  // ໂດຍຜູ້ໃຊ້ບໍ່ຕ້ອງເຮັດຫຍັງເພີ່ມ. ປອດໄພທີ່ຈະລອງໃໝ່ (ອອກບີນ ແລະ ອື່ນໆ ມີ requestId ກັນຊ້ຳຢູ່ແລ້ວ).
+  var GS_RETRY_COUNT = 2; // ລອງຄັ້ງທຳອິດ + ລອງໃໝ່ 2 ຄັ້ງ = ລວມ 3 ຄັ້ງກ່ອນຍອມແພ້
+  var GS_RETRY_DELAYS_MS = [900, 1800];
+  function gsPost(body){
+    function attempt(n){
+      return gsPostOnce(body).catch(function(err){
+        if(n >= GS_RETRY_COUNT) throw err;
+        var delay = GS_RETRY_DELAYS_MS[n] || 1800;
+        return new Promise(function(resolve){ setTimeout(resolve, delay); }).then(function(){ return attempt(n+1); });
+      });
+    }
+    return attempt(0);
   }
 
   function loadSession(){
@@ -2477,7 +2496,9 @@
       return Promise.resolve({ ok:false, error:'ຍັງເຊື່ອມຕໍ່ Google Sheet ບໍ່ໄດ້' });
     }
     retryPendingBillsInFlight = Promise.all(arr.map(function(p){
-      return gsPost({ action:'issueBill', token: CONFIG.SHARED_TOKEN, sheetUrl: currentUser.sheetUrl, billTab: p.billTab,
+      // ໃຊ້ gsPostOnce (ບໍ່ລອງໃໝ່ອັດຕະໂນມັດຊ້ອນ) ຕັ້ງໃຈ — ຟັງຊັນນີ້ເອງກໍ່ຄືການ "ລອງໃໝ່" ຢູ່ແລ້ວ (ຖືກເອີ້ນຊ້ຳທຸກ
+      // 30 ວິນາທີ), ຖ້າໃຫ້ gsPost ລອງໃໝ່ 3 ຊັ້ນໃນຕົວມັນເອງອີກ ຈະເຮັດໃຫ້ແຕ່ລະຮອບລໍດົນເກີນໄປໂດຍບໍ່ຈຳເປັນ
+      return gsPostOnce({ action:'issueBill', token: CONFIG.SHARED_TOKEN, sheetUrl: currentUser.sheetUrl, billTab: p.billTab,
         dateStr: p.dateStr, timeStr: p.timeStr, username: p.username, totalAll: p.totalAll, requestId: p.requestId, lineGroups: p.lineGroups })
         .then(function(res){ return { p: p, ok: !!(res && res.ok) }; })
         .catch(function(){ return { p: p, ok: false }; });
@@ -2545,7 +2566,10 @@
 
     function postGroups(gr, billTab, totalAllCur, requestId){
       if(gr.length === 0) return Promise.resolve(null);
-      return gsPost({
+      // ໃຊ້ gsPostOnce ຕັ້ງໃຈ (ບໍ່ແມ່ນ gsPost ທີ່ລອງໃໝ່ອັດຕະໂນມັດ) — ອອກບີນຕ້ອງໄວ, ຖ້າລົ້ມເຫລວຈະອອກບີນ
+      // ທ້ອງຖິ່ນທັນທີ ແລ້ວຄ້າງໄວ້ຊິ້ງພາຍຫລັງ (ເບິ່ງ catch ຂ້າງລຸ່ມ + retryPendingBills) ແທນທີ່ຈະລໍລອງໃໝ່ 3 ຊັ້ນ
+      // ຢູ່ບ່ອນນີ້ກ່ອນ (ຈະເຮັດໃຫ້ລູກຄ້າລໍດົນເກີນໄປ).
+      return gsPostOnce({
         action: 'issueBill', token: CONFIG.SHARED_TOKEN, sheetUrl: currentUser.sheetUrl, billTab: billTab,
         dateStr: dateStr, timeStr: timeStr, username: username, totalAll: totalAllCur, requestId: requestId,
         lineGroups: gr.map(function(g){ return { lineNo: g.lineNo, items: g.items }; })
@@ -2689,10 +2713,18 @@
         queries.push({ num:q.num, label:q.label + ' ' + t.tag, rate:q.rate, category:q.category, billTab:t.billTab, currency:t.currency });
       });
     });
-    Promise.all(queries.map(function(q){
-      return searchBillsNow(q.num, q.category, q.billTab, dateStr, timeFrom, timeTo).then(function(res){ return { q: q, res: res }; });
+    // ຍິງຄຳຂໍເຫລົ່ານີ້ແບບ "ແບ່ງເທື່ອລະໜ້ອຍ" (stagger) ແທນທີ່ຈະຍິງພ້ອມກັນໝົດທີ່ດຽວ (ອາດເຖິງ 6 ຄຳຂໍ —
+    // 3 ໝວດ x 2 ສະກຸນເງິນ) — ການຍິງພ້ອມກັນຫລາຍເກີນໄປໃສ່ Apps Script ອັນດຽວກັນ ແມ່ນສາເຫດຫລັກທີ່ເຮັດໃຫ້
+    // ບາງຄຳຂໍລົ້ມເຫລວແບບສຸ່ມໆ (HTTP 404 / "Load failed") ທັງທີ່ URL ແລະ deploy ຖືກຕ້ອງດີ — Google ຈຳກັດ
+    // ຈຳນວນຄຳຂໍພ້ອມກັນໃສ່ web app ອັນດຽວກັນ. ຍິງຫ່າງກັນເລັກນ້ອຍ (150ms) ຊ່ວຍຫລີກລ່ຽງບັນຫານີ້ໄດ້ຫລາຍ,
+    // ບວກກັບ gsPost ທີ່ລອງໃໝ່ອັດຕະໂນມັດ (ເບິ່ງ gsPost ຂ້າງເທິງ) ເຮັດໃຫ້ແທບບໍ່ພົບບັນຫານີ້ອີກ.
+    Promise.all(queries.map(function(q, idx){
+      return new Promise(function(resolve){ setTimeout(resolve, idx * 150); })
+        .then(function(){ return searchBillsNow(q.num, q.category, q.billTab, dateStr, timeFrom, timeTo); })
+        .then(function(res){ return { q: q, res: res }; });
     })).then(function(results){
       var htmlParts = [];
+      var anyConnError = false;
       results.forEach(function(item){
         var matches = (item.res && item.res.ok) ? item.res.matches : [];
         if(matches && matches.length > 0){
@@ -2702,19 +2734,43 @@
         } else if(item.q.currency === tabsToSearch[0].currency){
           // ສະແດງ "ບໍ່ພົບ" ສະເພາະຊິດທຳອິດທີ່ຄົ້ນ (ກັນຂໍ້ຄວາມຊ້ຳກັນຖ້າຄົ້ນທັງ 2 ຊິດ)
           var reason = (item.res && !item.res.ok && item.res.error) ? (' (' + item.res.error + ')') : '';
+          if(reason) anyConnError = true; // ມີຂໍ້ຄວາມ error ຈິງ (ບໍ່ແມ່ນແຄ່ "ຫາບໍ່ພົບ") = ອາດເປັນບັນຫາເຊື່ອມຕໍ່
           htmlParts.push('<div class="empty-note">' + escapeHtml(item.q.label) + ' "' + escapeHtml(item.q.num) + '" — ບໍ່ພົບບີນທີ່ຖືກ' + escapeHtml(reason) + '</div>');
         }
       });
+      // ຖ້າມີຢ່າງໜ້ອຍ 1 ໝວດທີ່ຜິດພາດແທ້ (ບໍ່ແມ່ນແຄ່ "ຫາບໍ່ພົບ") — ເພີ່ມປຸ່ມລອງໃໝ່ງ່າຍໆໃຫ້ກົດຄືນໂດຍບໍ່ຕ້ອງພິມໃໝ່
+      if(anyConnError){
+        htmlParts.push('<button type="button" class="btn compact" id="winSearchRetryBtn" style="margin-top:8px;">🔄 ລອງຄົ້ນຫາໃໝ່</button>');
+      }
       if(wrap) wrap.innerHTML = htmlParts.join('');
+      var retryBtn = document.getElementById('winSearchRetryBtn');
+      if(retryBtn) retryBtn.addEventListener('click', function(){ autoSearchWinningBills(); });
     });
   }
 
 
   // ---------- parsing helpers ----------
+  // parseNumberTokens: ຮັບເລກ 1-3 ໂຕ (ໃຊ້ສະເພາະເປັນ "ໂຕນຳໜ້າ" ຂອງແຖວຫລັກ — ເຊັ່ນ ຫລັກ 1 2 3 = 500
+  // ແມ່ນຕັ້ງໃຈໃຊ້ເລກ 1 ໂຕ (1,2,3) ເພື່ອເອົາໄປຕໍ່ໜ້າຊຸດເລກ 2 ໂຕແລ້ວໄດ້ເລກ 3 ໂຕອອກມາ — ບໍ່ແມ່ນການຖືກເດີມພັນ
+  // ເລກ 1 ໂຕໂດຍກົງ) — ຫ້າມໃຊ້ຟັງຊັນນີ້ກັບຊຸດເລກເດີມພັນຕົວຈິງ, ໃຫ້ໃຊ້ parseBetNumberTokens ແທນ.
   function parseNumberTokens(str){
     return str.split(/[,.\-_;\/\s]+/)
       .map(function(s){ return s.trim(); })
       .filter(function(s){ return s.length > 0 && s.length <= 3 && /^\d+$/.test(s); });
+  }
+  // parseBetNumberTokens: ຮັບສະເພາະເລກ 2 ໂຕ ຫລື 3 ໂຕ ເທົ່ານັ້ນ (ລວມທັງບົນ-ລ່າງ) — ໃຊ້ສຳລັບຊຸດເລກເດີມພັນ
+  // ຕົວຈິງ (ຕາມແຖວທີ່ມີລາຄາ). ຕັດເລກ 1 ໂຕ ຖິ້ມ ບໍ່ອ່ານ ບໍ່ຄິດໄລ່ ບໍ່ຕິດໄພ — ປ້ອງກັນເລກ 1 ໂຕ (ມັກເກີດ
+  // ຈາກການພິມພາດ ຫລື ແຕະໂດນຕົວເລກຫລົງ) ຫລົງເຂົ້າມາເປັນການເດີມພັນຕົວຈິງໂດຍບໍ່ໄດ້ຕັ້ງໃຈ.
+  function parseBetNumberTokens(str){
+    return str.split(/[,.\-_;\/\s]+/)
+      .map(function(s){ return s.trim(); })
+      .filter(function(s){ return s.length >= 2 && s.length <= 3 && /^\d+$/.test(s); });
+  }
+  // ຫາເລກ 1 ໂຕທີ່ຖືກຂ້າມໄປ (ໃຊ້ແຕ່ງຂໍ້ຄວາມເຕືອນ ໃຫ້ຜູ້ໃຊ້ຮູ້ວ່າເປັນຫຍັງຍອດຈຶ່ງບໍ່ຕົງກັບທີ່ພິມ)
+  function findSkippedSingleDigits(str){
+    return str.split(/[,.\-_;\/\s]+/)
+      .map(function(s){ return s.trim(); })
+      .filter(function(s){ return s.length === 1 && /^\d$/.test(s); });
   }
 
   function parseSinglePrice(token, literal){
@@ -2914,7 +2970,11 @@
 
       var split = findPriceSplit(line);
       if(split){
-        var leftNumbers = parseNumberTokens(split.left);
+        var leftNumbers = parseBetNumberTokens(split.left);
+        var skippedSingle = findSkippedSingleDigits(split.left);
+        if(skippedSingle.length > 0){
+          warnings.push('ແຖວ ' + lineNo + ': ຂ້າມເລກ 1 ໂຕ (' + skippedSingle.join(', ') + ') — ອ່ານສະເພາະເລກ 2 ໂຕ ແລະ 3 ໂຕ');
+        }
         var priced = computePriceFromRight(split.right);
         if(!priced){
           warnings.push('ແຖວ ' + lineNo + ': ອ່ານລາຄາບໍ່ໄດ້');
@@ -2941,9 +3001,15 @@
         var newTwoDigit = allNumbers.filter(function(n){ return n.length === 2; });
         if(newTwoDigit.length > 0) hakBase = newTwoDigit;
       } else {
-        var nums = parseNumberTokens(line);
+        var nums = parseBetNumberTokens(line);
+        var skippedSingleBare = findSkippedSingleDigits(line);
         if(nums.length > 0){
+          if(skippedSingleBare.length > 0){
+            warnings.push('ແຖວ ' + lineNo + ': ຂ້າມເລກ 1 ໂຕ (' + skippedSingleBare.join(', ') + ') — ອ່ານສະເພາະເລກ 2 ໂຕ ແລະ 3 ໂຕ');
+          }
           pendingBuffer.push({ lineNo: lineNo, numbers: nums, raw: rawLine });
+        } else if(skippedSingleBare.length > 0){
+          warnings.push('ແຖວ ' + lineNo + ': ມີແຕ່ເລກ 1 ໂຕ (' + skippedSingleBare.join(', ') + ') — ຂ້າມ, ອ່ານສະເພາະເລກ 2 ໂຕ ແລະ 3 ໂຕ');
         } else {
           warnings.push('ແຖວ ' + lineNo + ': ອ່ານບໍ່ອອກ ("' + line + '")');
         }
